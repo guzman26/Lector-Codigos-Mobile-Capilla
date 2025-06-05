@@ -1,0 +1,126 @@
+/* Layout Component Styles */
+.layout {
+  min-height: 100vh;
+  background-color: #f8f9fa;
+  color: #2c2c2c;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+.layout-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.5rem;
+  background-color: #ffffff;
+  border-bottom: 1px solid #e1e5e9;
+  position: sticky;
+  top: 0;
+  z-index: 50;
+}
+
+.header-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.header-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin: 0;
+  color: #2c2c2c;
+}
+
+.terminal-id {
+  font-size: 0.875rem;
+  color: #6c757d;
+  font-weight: 400;
+}
+
+.status-indicator {
+  padding: 0.5rem 1rem;
+  background-color: #d4edda;
+  border: 1px solid #c3e6cb;
+  border-radius: 4px;
+}
+
+.status-text {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #155724;
+}
+
+.layout-content {
+  flex: 1;
+  padding: 2rem 1.5rem;
+  max-width: 600px;
+  margin: 0 auto;
+  width: 100%;
+  padding-bottom: 6rem; /* Space for fixed footer */
+  box-sizing: border-box;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .layout-header {
+    padding: 1rem;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+  
+  .status-indicator {
+    align-self: flex-end;
+  }
+  
+  .header-title {
+    font-size: 1.25rem;
+  }
+  
+  .layout-content {
+    padding: 1.5rem 1rem 5rem 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .layout-header {
+    padding: 0.75rem;
+  }
+  
+  .header-title {
+    font-size: 1.125rem;
+  }
+  
+  .layout-content {
+    padding: 1rem 0.75rem 4.5rem 0.75rem;
+  }
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  .layout {
+    background-color: #0d1117;
+    color: #e6edf3;
+  }
+  
+  .layout-header {
+    background-color: #21262d;
+    border-bottom-color: #30363d;
+  }
+  
+  .header-title {
+    color: #e6edf3;
+  }
+  
+  .status-indicator {
+    background-color: #1a2332;
+    border-color: #2d4a5a;
+  }
+  
+  .status-text {
+    color: #7ce383;
+  }
+} 

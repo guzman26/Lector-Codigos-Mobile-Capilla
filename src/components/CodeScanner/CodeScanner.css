@@ -1,0 +1,357 @@
+/* CodeScanner Component Styles */
+.code-scanner {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.scanner-section {
+  background-color: #ffffff;
+  border: 1px solid #e1e5e9;
+  border-radius: 8px;
+  padding: 2rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.scanner-title {
+  font-size: 1.375rem;
+  font-weight: 600;
+  margin: 0 0 1.5rem 0;
+  color: #2c2c2c;
+}
+
+.scanner-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.input-label {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #6c757d;
+}
+
+.code-input {
+  background-color: #ffffff;
+  border: 2px solid #d0d7de;
+  border-radius: 6px;
+  padding: 0.875rem 1rem;
+  font-family: 'Courier New', monospace;
+  font-size: 1.125rem;
+  color: #2c2c2c;
+  min-height: 52px;
+  transition: border-color 0.15s ease;
+  letter-spacing: 0.1em;
+}
+
+.code-input:focus {
+  outline: none;
+  border-color: #0969da;
+  box-shadow: 0 0 0 3px rgba(9, 105, 218, 0.1);
+}
+
+.code-input:disabled {
+  background-color: #f6f8fa;
+  color: #6c757d;
+  cursor: not-allowed;
+}
+
+.button-group {
+  display: flex;
+  gap: 1rem;
+}
+
+.scan-btn {
+  flex: 1;
+  background-color: #ffffff;
+  border: 2px solid #d0d7de;
+  border-radius: 8px;
+  padding: 1rem 1.5rem;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  text-align: center;
+  font-family: inherit;
+  font-size: 1rem;
+  font-weight: 600;
+  min-height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.scan-btn:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+.scan-btn:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.scan-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.scan-btn.primary {
+  background-color: #0969da;
+  border-color: #0969da;
+  color: #ffffff;
+}
+
+.scan-btn.primary:hover:not(:disabled) {
+  background-color: #0860ca;
+  border-color: #0860ca;
+  box-shadow: 0 2px 6px rgba(9, 105, 218, 0.2);
+}
+
+.scan-btn.secondary {
+  background-color: #f6f8fa;
+  border-color: #d0d7de;
+  color: #656d76;
+}
+
+.scan-btn.secondary:hover:not(:disabled) {
+  background-color: #f1f3f4;
+  border-color: #8c959f;
+  color: #2c2c2c;
+}
+
+.error-message {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 1rem;
+  background-color: #fff5f5;
+  border: 1px solid #fed7d7;
+  border-radius: 6px;
+  margin-top: 1rem;
+}
+
+.error-icon {
+  font-size: 1.125rem;
+}
+
+.error-text {
+  font-size: 0.875rem;
+  color: #e53e3e;
+  font-weight: 500;
+}
+
+.result-section {
+  background-color: #ffffff;
+  border: 1px solid #e1e5e9;
+  border-radius: 8px;
+  padding: 2rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.result-title {
+  font-size: 1.375rem;
+  font-weight: 600;
+  margin: 0 0 1.5rem 0;
+  color: #2c2c2c;
+}
+
+.result-card {
+  border: 1px solid #f1f3f4;
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.result-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 1.5rem;
+  background-color: #f6f8fa;
+  border-bottom: 1px solid #f1f3f4;
+}
+
+.code-display {
+  font-family: 'Courier New', monospace;
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: #2c2c2c;
+  letter-spacing: 0.1em;
+}
+
+.code-type {
+  padding: 0.25rem 0.75rem;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.code-type.caja {
+  background-color: #dbeafe;
+  color: #1e40af;
+}
+
+.code-type.pallet {
+  background-color: #d1fae5;
+  color: #065f46;
+}
+
+.result-details {
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.detail-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.detail-title {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #6c757d;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin: 0;
+}
+
+.detail-text {
+  font-size: 0.875rem;
+  color: #2c2c2c;
+  margin: 0;
+  line-height: 1.4;
+}
+
+.detail-description {
+  font-size: 0.875rem;
+  color: #6c757d;
+  margin: 0;
+  line-height: 1.4;
+}
+
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.375rem 0.75rem;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  width: fit-content;
+}
+
+.status-badge.activo {
+  background-color: #d4edda;
+  color: #155724;
+}
+
+.status-badge.inactivo {
+  background-color: #f8d7da;
+  color: #721c24;
+}
+
+.status-badge.bloqueado {
+  background-color: #fff3cd;
+  color: #856404;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .scanner-section,
+  .result-section {
+    padding: 1.5rem;
+  }
+  
+  .button-group {
+    flex-direction: column;
+  }
+  
+  .scan-btn {
+    flex: none;
+  }
+  
+  .result-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .scanner-section,
+  .result-section {
+    padding: 1rem;
+  }
+  
+  .code-input {
+    font-size: 1rem;
+  }
+  
+  .result-details {
+    padding: 1rem;
+  }
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  .scanner-section,
+  .result-section {
+    background-color: #21262d;
+    border-color: #30363d;
+  }
+  
+  .scanner-title,
+  .result-title {
+    color: #e6edf3;
+  }
+  
+  .input-label,
+  .detail-title {
+    color: #8b949e;
+  }
+  
+  .code-input {
+    background-color: #0d1117;
+    border-color: #30363d;
+    color: #e6edf3;
+  }
+  
+  .code-input:disabled {
+    background-color: #21262d;
+    color: #8b949e;
+  }
+  
+  .code-input:focus {
+    border-color: #2f81f7;
+    box-shadow: 0 0 0 3px rgba(47, 129, 247, 0.1);
+  }
+  
+  .result-card {
+    border-color: #30363d;
+  }
+  
+  .result-header {
+    background-color: #262c36;
+    border-bottom-color: #30363d;
+  }
+  
+  .code-display,
+  .detail-text {
+    color: #e6edf3;
+  }
+  
+  .detail-description {
+    color: #8b949e;
+  }
+} 
