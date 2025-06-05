@@ -64,4 +64,25 @@ export interface CodeValidationResult {
   isValid: boolean;
   type?: 'box' | 'pallet';
   errorMessage?: string;
+}
+
+/**
+ * Report Issue Request
+ */
+export interface PostIssueRequest {
+  descripcion: string;
+}
+
+/**
+ * Report Issue Response
+ */
+export interface IssueReportResult {
+  id?: string;
+  mensaje?: string;
+  fechaReporte?: string;
+  estado?: 'recibido' | 'en_proceso' | 'resuelto';
+  // Propiedades adicionales que puede devolver la API real
+  issueNumber?: string;
+  message?: string;
+  [key: string]: any; // Para propiedades adicionales no esperadas
 } 

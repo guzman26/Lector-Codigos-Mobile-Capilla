@@ -110,12 +110,51 @@ const processResponse = async <T>(response: Response): Promise<ApiResponse<T>> =
   }
 
   if (!response.ok) {
-    const error = data as ApiError;
+    let errorMessage = `Error ${response.status}: ${response.statusText}`;
+    
+    // Handle common HTTP errors with more descriptive messages
+    switch (response.status) {
+      case 404:
+        errorMessage = 'Endpoint no encontrado - verifica la configuración de la API';
+        break;
+      case 405:
+        errorMessage = 'Método no permitido - el endpoint no soporta esta operación';
+        break;
+      case 500:
+        errorMessage = 'Error interno del servidor - contacta al administrador';
+        break;
+      case 503:
+        errorMessage = 'Servicio no disponible - intenta nuevamente más tarde';
+        break;
+      default:
+        if (typeof data === 'object' && data && 'message' in data) {
+          errorMessage = (data as ApiError).message;
+        }
+    }
+    
     throw new ApiClientError(
-      error.message || `Error ${response.status}: ${response.statusText}`,
-      error.code || response.status,
-      error.details
+      errorMessage,
+      response.status,
+      data
     );
+  }
+
+  // Handle responses that don't follow our standard ApiResponse format
+  // If it's a successful response but doesn't have the expected structure, normalize it
+  if (typeof data === 'object' && data) {
+    const responseData = data as any;
+    
+    // If it already has our expected structure, return as-is
+    if ('success' in responseData || 'data' in responseData || 'error' in responseData) {
+      return data as ApiResponse<T>;
+    }
+    
+    // Otherwise, wrap it in our standard format
+    return {
+      success: true,
+      data: responseData,
+      message: responseData.message || 'Request successful'
+    } as ApiResponse<T>;
   }
 
   return data as ApiResponse<T>;
@@ -151,8 +190,24 @@ export const get = async <T>(
     if (error instanceof ApiClientError) {
       throw error;
     }
+    
+    // Enhanced error handling for common network issues
+    let errorMessage = 'Error de conexión con el servidor';
+    
+    if (error instanceof Error) {
+      if (error.name === 'AbortError') {
+        errorMessage = 'Tiempo de espera agotado - la petición tardó demasiado';
+      } else if (error.message.includes('CORS')) {
+        errorMessage = 'Error de CORS - verifica la configuración del servidor';
+      } else if (error.message.includes('fetch')) {
+        errorMessage = 'Error de red - verifica tu conexión a internet';
+      } else if (error.message.includes('Failed to fetch')) {
+        errorMessage = 'No se pudo conectar al servidor - verifica la URL de la API';
+      }
+    }
+    
     throw new ApiClientError(
-      'Error de conexión con el servidor',
+      errorMessage,
       'NETWORK_ERROR',
       error
     );
@@ -183,8 +238,24 @@ export const post = async <T>(
     if (error instanceof ApiClientError) {
       throw error;
     }
+    
+    // Enhanced error handling for common network issues
+    let errorMessage = 'Error de conexión con el servidor';
+    
+    if (error instanceof Error) {
+      if (error.name === 'AbortError') {
+        errorMessage = 'Tiempo de espera agotado - la petición tardó demasiado';
+      } else if (error.message.includes('CORS')) {
+        errorMessage = 'Error de CORS - verifica la configuración del servidor';
+      } else if (error.message.includes('fetch')) {
+        errorMessage = 'Error de red - verifica tu conexión a internet';
+      } else if (error.message.includes('Failed to fetch')) {
+        errorMessage = 'No se pudo conectar al servidor - verifica la URL de la API';
+      }
+    }
+    
     throw new ApiClientError(
-      'Error de conexión con el servidor',
+      errorMessage,
       'NETWORK_ERROR',
       error
     );

@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useScannedCodeContext } from '../context/ScannedCodeContext';
 import { formatCodeForDisplay } from '../api';
+import ReportIssueModal from '../components/ReportIssueModal/ReportIssueModal';
 import './Dashboard.css';
 
 const Dashboard: React.FC = () => {
@@ -9,7 +10,7 @@ const Dashboard: React.FC = () => {
   const [inputCode, setInputCode] = useState('');
   const [showScanner, setShowScanner] = useState(false);
   const { data, loading, error, history, getCodeInfo, reset } = useScannedCodeContext();
-
+  const [showReportModal, setShowReportModal] = useState(false);
   const handleScanClick = () => {
     setShowScanner(!showScanner);
   };
@@ -24,6 +25,10 @@ const Dashboard: React.FC = () => {
 
   const handleQuickScan = async (code: string) => {
     await getCodeInfo(code);
+  };
+
+  const handleReportClick = () => {
+    setShowReportModal(true);
   };
 
   return (
@@ -47,7 +52,8 @@ const Dashboard: React.FC = () => {
           <span className="btn-text">Ver Historial ({history.length})</span>
         </button>
         
-        <button className="action-btn">
+        <button className="action-btn"
+        onClick={handleReportClick}>
           <span className="btn-text">Reportes</span>
         </button>
       </div>
@@ -200,6 +206,12 @@ const Dashboard: React.FC = () => {
           </div>
         </div>
       </div>
+
+      {/* Modal de Reporte de Problemas */}
+      <ReportIssueModal 
+        isOpen={showReportModal}
+        onClose={() => setShowReportModal(false)}
+      />
     </div>
   );
 };

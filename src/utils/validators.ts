@@ -95,4 +95,43 @@ export const formatCodeForDisplay = (code: string): string => {
   }
   
   return clean;
+};
+
+/**
+ * Validates issue report description
+ */
+export const validateIssueDescription = (description: string): { isValid: boolean; errorMessage?: string } => {
+  if (!description || typeof description !== 'string') {
+    return {
+      isValid: false,
+      errorMessage: 'La descripción es requerida'
+    };
+  }
+
+  const trimmed = description.trim();
+
+  if (trimmed.length === 0) {
+    return {
+      isValid: false,
+      errorMessage: 'La descripción no puede estar vacía'
+    };
+  }
+
+  if (trimmed.length > 1000) {
+    return {
+      isValid: false,
+      errorMessage: 'La descripción no puede exceder los 1000 caracteres'
+    };
+  }
+
+  if (trimmed.length < 10) {
+    return {
+      isValid: false,
+      errorMessage: 'La descripción debe tener al menos 10 caracteres'
+    };
+  }
+
+  return {
+    isValid: true
+  };
 }; 
