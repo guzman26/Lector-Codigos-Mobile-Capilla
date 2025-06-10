@@ -4,6 +4,9 @@ import Layout from '../components/Layout';
 import Dashboard from '../views/Dashboard';
 import Configuracion from '../views/Configuracion';
 import Historial from '../views/Historial';
+import RegistrarCaja from '../views/Scanning/RegistrarCajaNueva/RegistrarCaja';
+import ConsultarCodigo from '../views/Scanning/ConsultarCodigo/ConsultarCodigo';
+import CrearPallet from '../views/Scanning/CreatePalletForm/CreatePalletForm';
 
 const AppRoutes: React.FC = () => {
   return (
@@ -21,6 +24,15 @@ const AppRoutes: React.FC = () => {
           
           {/* History route */}
           <Route path="/historial" element={<Historial />} />
+          
+          {/* Register new box route */}
+          <Route path="/registrar-caja" element={<RegistrarCaja />} />
+
+          {/* Consultar código route */}
+          <Route path="/consultar-codigo" element={<ConsultarCodigo />} />
+
+          {/* Crear pallet route */}
+          <Route path="/crear-pallet" element={<CrearPallet />} />
           
           {/* Future routes can be added here */}
           {/* <Route path="/scanner" element={<Scanner />} /> */}

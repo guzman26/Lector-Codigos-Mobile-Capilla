@@ -6,20 +6,20 @@
 }
 
 .config-section {
-  background-color: #ffffff;
-  border: 1px solid #e1e5e9;
+  background-color: var(--background-white);
+  border: 1px solid var(--border-light);
   border-radius: 8px;
   padding: 2rem;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 1px 3px var(--shadow-light);
 }
 
 .config-title {
   font-size: 1.375rem;
   font-weight: 600;
   margin: 0 0 2rem 0;
-  color: #2c2c2c;
+  color: var(--text-primary);
   padding-bottom: 1rem;
-  border-bottom: 2px solid #f1f3f4;
+  border-bottom: 2px solid var(--border-light);
 }
 
 .config-group {
@@ -30,7 +30,7 @@
   font-size: 1.125rem;
   font-weight: 600;
   margin: 0 0 1rem 0;
-  color: #2c2c2c;
+  color: var(--text-primary);
 }
 
 .config-item {
@@ -43,18 +43,18 @@
 .config-label {
   font-size: 0.875rem;
   font-weight: 500;
-  color: #6c757d;
+  color: var(--text-secondary);
 }
 
 .config-input,
 .config-select {
-  background-color: #ffffff;
-  border: 2px solid #d0d7de;
+  background-color: var(--input-bg);
+  border: 2px solid var(--input-border);
   border-radius: 6px;
   padding: 0.875rem 1rem;
   font-family: inherit;
   font-size: 1rem;
-  color: #2c2c2c;
+  color: var(--text-primary);
   min-height: 52px;
   transition: border-color 0.15s ease;
 }
@@ -62,13 +62,13 @@
 .config-input:focus,
 .config-select:focus {
   outline: none;
-  border-color: #0969da;
-  box-shadow: 0 0 0 3px rgba(9, 105, 218, 0.1);
+  border-color: var(--input-focus-border);
+  box-shadow: 0 0 0 3px var(--shadow-focus);
 }
 
 .config-input[readonly] {
-  background-color: #f6f8fa;
-  color: #6c757d;
+  background-color: var(--input-readonly-bg);
+  color: var(--text-secondary);
 }
 
 .config-actions {
@@ -77,12 +77,12 @@
   gap: 1rem;
   margin-top: 2rem;
   padding-top: 2rem;
-  border-top: 1px solid #f1f3f4;
+  border-top: 1px solid var(--border-light);
 }
 
 .config-btn {
-  background-color: #ffffff;
-  border: 2px solid #d0d7de;
+  background-color: var(--background-white);
+  border: 2px solid var(--input-border);
   border-radius: 8px;
   padding: 1rem 1.5rem;
   cursor: pointer;
@@ -98,43 +98,43 @@
 }
 
 .config-btn:hover {
-  background-color: #f6f8fa;
-  border-color: #8c959f;
+  background-color: var(--btn-secondary-bg);
+  border-color: var(--border-dark);
   transform: translateY(-1px);
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 6px var(--shadow-medium);
 }
 
 .config-btn:active {
-  background-color: #eaeef2;
+  background-color: var(--btn-secondary-hover);
   transform: translateY(0);
 }
 
 .config-btn.primary {
-  background-color: #0969da;
-  border-color: #0969da;
-  color: #ffffff;
+  background-color: var(--btn-primary-bg);
+  border-color: var(--btn-primary-bg);
+  color: var(--text-white);
 }
 
 .config-btn.primary:hover {
-  background-color: #0860ca;
-  border-color: #0860ca;
-  box-shadow: 0 2px 6px rgba(9, 105, 218, 0.2);
+  background-color: var(--btn-primary-hover);
+  border-color: var(--btn-primary-hover);
+  box-shadow: 0 2px 6px var(--shadow-focus);
 }
 
 .config-btn.primary:active {
-  background-color: #0757ba;
+  background-color: var(--btn-primary-hover);
 }
 
 .config-btn.secondary {
-  background-color: #f6f8fa;
-  border-color: #d0d7de;
-  color: #656d76;
+  background-color: var(--btn-secondary-bg);
+  border-color: var(--input-border);
+  color: var(--text-muted);
 }
 
 .config-btn.secondary:hover {
-  background-color: #f1f3f4;
-  border-color: #8c959f;
-  color: #2c2c2c;
+  background-color: var(--btn-secondary-hover);
+  border-color: var(--border-dark);
+  color: var(--text-primary);
 }
 
 /* Responsive design */
@@ -182,70 +182,87 @@
   }
 }
 
-/* Dark mode support */
-@media (prefers-color-scheme: dark) {
-  .config-section {
-    background-color: #21262d;
-    border-color: #30363d;
+/* Dark mode support is handled by CSS variables */
+
+/* Theme Toggle Styles */
+.theme-toggle-container {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 0.5rem;
+}
+
+.theme-label {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  font-weight: 500;
+  min-width: 80px;
+}
+
+.theme-toggle {
+  position: relative;
+  width: 60px;
+  height: 32px;
+  background-color: var(--theme-toggle-bg);
+  border: none;
+  border-radius: 16px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  padding: 2px;
+}
+
+.theme-toggle:hover {
+  background-color: var(--border-dark);
+}
+
+.theme-toggle.active {
+  background-color: var(--theme-toggle-active);
+}
+
+.theme-toggle.active:hover {
+  background-color: var(--btn-primary-hover);
+}
+
+.theme-toggle-thumb {
+  width: 28px;
+  height: 28px;
+  background-color: var(--theme-toggle-thumb);
+  border-radius: 50%;
+  box-shadow: 0 2px 4px var(--shadow-dark);
+  transition: transform 0.3s ease;
+}
+
+.theme-toggle.active .theme-toggle-thumb {
+  transform: translateX(28px);
+}
+
+/* Dark theme styles are handled by CSS variables */
+
+/* Mobile responsive styles for toggle */
+@media (max-width: 480px) {
+  .theme-toggle-container {
+    gap: 0.75rem;
   }
   
-  .config-title,
-  .group-title {
-    color: #e6edf3;
+  .theme-label {
+    font-size: 0.8rem;
+    min-width: 70px;
   }
   
-  .config-title {
-    border-bottom-color: #30363d;
+  .theme-toggle {
+    width: 52px;
+    height: 18px;
+    border-radius: 14px;
   }
   
-  .config-label {
-    color: #8b949e;
+  .theme-toggle-thumb {
+    width: 24px;
+    height: 24px;
   }
   
-  .config-input,
-  .config-select {
-    background-color: #0d1117;
-    border-color: #30363d;
-    color: #e6edf3;
-  }
-  
-  .config-input[readonly] {
-    background-color: #21262d;
-    color: #8b949e;
-  }
-  
-  .config-input:focus,
-  .config-select:focus {
-    border-color: #2f81f7;
-    box-shadow: 0 0 0 3px rgba(47, 129, 247, 0.1);
-  }
-  
-  .config-actions {
-    border-top-color: #30363d;
-  }
-  
-  .config-btn {
-    background-color: #21262d;
-    border-color: #30363d;
-    color: #e6edf3;
-  }
-  
-  .config-btn:hover {
-    background-color: #30363d;
-    border-color: #8b949e;
-  }
-  
-  .config-btn:active {
-    background-color: #262c36;
-  }
-  
-  .config-btn.secondary {
-    background-color: #262c36;
-    color: #8b949e;
-  }
-  
-  .config-btn.secondary:hover {
-    background-color: #30363d;
-    color: #e6edf3;
+  .theme-toggle.active .theme-toggle-thumb {
+    transform: translateX(24px);
   }
 } 

@@ -25,10 +25,21 @@ export type {
   GetInfoFromScannedCodeRequest,
   ScannedCodeInfo,
   CodeValidationResult,
+  RegisterBoxRequest,
+  RegisterBoxResult,
+  ProcessScanRequest,
+  ProcessScanResult,
 } from './types';
 
 // Endpoints
-export { endpoints, getInfoFromScannedCode, getScannedCodeInfo } from './endpoints';
+export { 
+  endpoints, 
+  getInfoFromScannedCode, 
+  registerBox,
+  submitBoxRegistration,
+  processScan,
+  submitScan
+} from './endpoints';
 
 // Utilities (re-export for convenience)
 export {

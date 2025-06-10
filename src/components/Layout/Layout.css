@@ -1,8 +1,8 @@
 /* Layout Component Styles */
 .layout {
   min-height: 100vh;
-  background-color: #f8f9fa;
-  color: #2c2c2c;
+  background-color: var(--background-light-gray);
+  color: var(--text-primary);
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
   position: relative;
   display: flex;
@@ -14,8 +14,8 @@
   justify-content: space-between;
   align-items: center;
   padding: 1.5rem;
-  background-color: #ffffff;
-  border-bottom: 1px solid #e1e5e9;
+  background-color: var(--background-white);
+  border-bottom: 1px solid var(--border-light);
   position: sticky;
   top: 0;
   z-index: 50;
@@ -31,26 +31,26 @@
   font-size: 1.5rem;
   font-weight: 600;
   margin: 0;
-  color: #2c2c2c;
+  color: var(--text-primary);
 }
 
 .terminal-id {
   font-size: 0.875rem;
-  color: #6c757d;
+  color: var(--text-secondary);
   font-weight: 400;
 }
 
 .status-indicator {
   padding: 0.5rem 1rem;
-  background-color: #d4edda;
-  border: 1px solid #c3e6cb;
+  background-color: var(--industrial-success);
+  border: 1px solid var(--industrial-success);
   border-radius: 4px;
 }
 
 .status-text {
   font-size: 0.875rem;
   font-weight: 500;
-  color: #155724;
+  color: var(--text-white);
 }
 
 .layout-content {
@@ -99,28 +99,4 @@
   }
 }
 
-/* Dark mode support */
-@media (prefers-color-scheme: dark) {
-  .layout {
-    background-color: #0d1117;
-    color: #e6edf3;
-  }
-  
-  .layout-header {
-    background-color: #21262d;
-    border-bottom-color: #30363d;
-  }
-  
-  .header-title {
-    color: #e6edf3;
-  }
-  
-  .status-indicator {
-    background-color: #1a2332;
-    border-color: #2d4a5a;
-  }
-  
-  .status-text {
-    color: #7ce383;
-  }
-} 
+/* Dark mode support is handled by CSS variables */ 

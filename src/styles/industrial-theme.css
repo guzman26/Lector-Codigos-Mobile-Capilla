@@ -1,0 +1,114 @@
+/* 
+ * Industrial Theme Design System
+ * A robust, machinery-inspired design system for warehouse management applications
+ */
+
+:root {
+  /* Industrial Color Palette */
+  --industrial-primary: #1a73e8;         /* Blue for primary actions */
+  --industrial-primary-dark: #0d47a1;    /* Darker blue for hovers */
+  --industrial-secondary: #f57c00;       /* Orange for secondary actions/accents */
+  --industrial-secondary-dark: #e65100;  /* Darker orange */
+  --industrial-success: #388e3c;         /* Green for success states */
+  --industrial-warning: #fbc02d;         /* Yellow for warnings */
+  --industrial-danger: #d32f2f;          /* Red for danger/errors */
+  --industrial-info: #0288d1;            /* Light blue for info */
+  
+  /* Neutral/Metal Colors */
+  --metal-50: #f5f5f5;                   /* Lightest metal/off-white */
+  --metal-100: #e6e6e6;                  /* Light metal gray */
+  --metal-200: #cccccc;                  /* Light metal */
+  --metal-300: #b8b8b8;                  /* Medium-light metal */
+  --metal-400: #999999;                  /* Medium metal */
+  --metal-500: #808080;                  /* Medium-dark metal */
+  --metal-600: #666666;                  /* Dark metal */
+  --metal-700: #4d4d4d;                  /* Darker metal */
+  --metal-800: #333333;                  /* Very dark metal */
+  --metal-900: #1a1a1a;                  /* Almost black metal */
+  
+  /* Accent Colors for Status */
+  --gauge-red: #f44336;                  /* Gauge indicators - critical */
+  --gauge-yellow: #ffeb3b;               /* Gauge indicators - warning */
+  --gauge-green: #4caf50;                /* Gauge indicators - good */
+  
+  /* Industrial Gradient Backgrounds */
+  --gradient-metal: linear-gradient(to bottom, var(--metal-200), var(--metal-300));
+  --gradient-blue-steel: linear-gradient(to bottom, #2c3e50, #4ca1af);
+  --gradient-copper: linear-gradient(to bottom, #b79891, #94716b);
+  
+  /* Extended Color Mappings for existing UI elements */
+  --background-white: #ffffff;
+  --background-light-gray: var(--metal-50);
+  --background-medium-gray: var(--metal-100);
+  --background-dark: var(--metal-800);
+  --background-darkest: var(--metal-900);
+  
+  /* Text Colors */
+  --text-primary: var(--metal-900);
+  --text-secondary: var(--metal-600);
+  --text-muted: var(--metal-500);
+  --text-light: var(--metal-400);
+  --text-white: #ffffff;
+  --text-on-dark: var(--metal-50);
+  
+  /* Border Colors */
+  --border-light: var(--metal-200);
+  --border-medium: var(--metal-300);
+  --border-dark: var(--metal-600);
+  --border-focus: var(--industrial-primary);
+  
+  /* Button Colors */
+  --btn-primary-bg: var(--industrial-primary);
+  --btn-primary-hover: var(--industrial-primary-dark);
+  --btn-secondary-bg: var(--metal-100);
+  --btn-secondary-hover: var(--metal-200);
+  
+  /* Form Colors */
+  --input-bg: #ffffff;
+  --input-border: var(--metal-300);
+  --input-focus-border: var(--industrial-primary);
+  --input-readonly-bg: var(--metal-50);
+  
+  /* Shadow Colors */
+  --shadow-light: rgba(0, 0, 0, 0.05);
+  --shadow-medium: rgba(0, 0, 0, 0.1);
+  --shadow-dark: rgba(0, 0, 0, 0.2);
+  --shadow-focus: rgba(26, 115, 232, 0.1);
+  
+  /* Theme-specific overrides */
+  --theme-toggle-bg: var(--metal-300);
+  --theme-toggle-active: var(--industrial-primary);
+  --theme-toggle-thumb: #ffffff;
+}
+
+/* Dark Theme Overrides */
+.dark-theme {
+  --background-white: var(--metal-800);
+  --background-light-gray: var(--metal-700);
+  --background-medium-gray: var(--metal-600);
+  --background-dark: var(--metal-900);
+  --background-darkest: #000000;
+  
+  --text-primary: var(--metal-50);
+  --text-secondary: var(--metal-200);
+  --text-muted: var(--metal-300);
+  --text-light: var(--metal-400);
+  
+  --border-light: var(--metal-600);
+  --border-medium: var(--metal-500);
+  --border-dark: var(--metal-400);
+  
+  --input-bg: var(--metal-900);
+  --input-border: var(--metal-600);
+  --input-readonly-bg: var(--metal-700);
+  
+  --btn-secondary-bg: var(--metal-700);
+  --btn-secondary-hover: var(--metal-600);
+  
+  --shadow-light: rgba(0, 0, 0, 0.2);
+  --shadow-medium: rgba(0, 0, 0, 0.4);
+  --shadow-dark: rgba(0, 0, 0, 0.6);
+  
+  --theme-toggle-bg: var(--metal-600);
+  --theme-toggle-thumb: var(--metal-100);
+} 

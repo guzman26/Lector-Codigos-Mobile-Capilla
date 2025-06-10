@@ -1,7 +1,10 @@
 import React from 'react';
+import { useTheme } from '../context/ThemeContext';
 import './Configuracion.css';
 
 const Configuracion: React.FC = () => {
+  const { isDarkMode, toggleTheme } = useTheme();
+
   return (
     <div className="configuracion-content">
       <div className="config-section">
@@ -24,6 +27,24 @@ const Configuracion: React.FC = () => {
               <option value="auto">Automático</option>
               <option value="manual">Manual</option>
             </select>
+          </div>
+        </div>
+
+        <div className="config-group">
+          <h3 className="group-title">Apariencia</h3>
+          <div className="config-item">
+            <label className="config-label">Tema:</label>
+            <div className="theme-toggle-container">
+              <span className="theme-label">Modo claro</span>
+              <button 
+                className={`theme-toggle ${isDarkMode ? 'active' : ''}`}
+                onClick={toggleTheme}
+                aria-label={`Cambiar a modo ${isDarkMode ? 'claro' : 'oscuro'}`}
+              >
+                <div className="theme-toggle-thumb"></div>
+              </button>
+              <span className="theme-label">Modo oscuro</span>
+            </div>
           </div>
         </div>
 

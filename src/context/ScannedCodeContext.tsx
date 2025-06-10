@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useCallback, ReactNode } from 'react';
-import { getScannedCodeInfo, ApiClientError } from '../api';
+import { getInfoFromScannedCode, ApiClientError } from '../api';
 import type { ScannedCodeInfo } from '../api/types';
 
 interface ScannedCodeContextType {
@@ -34,16 +34,15 @@ export const ScannedCodeProvider: React.FC<ScannedCodeProviderProps> = ({ childr
     setError(null);
 
     try {
-      const result = await getScannedCodeInfo(codigo);
+      const result = await getInfoFromScannedCode({ codigo });
+      if (result.data) {
+        setData(result.data);
+      } else {
+        setError('No se encontró información para este código');
+        setData(null);
+      }
       
-      setData(result);
       
-      // Agregar al historial (evitar duplicados)
-      setHistory(prev => {
-        const exists = prev.some(item => item.codigo === result.codigo);
-        if (exists) return prev;
-        return [result, ...prev.slice(0, 9)]; // Mantener solo 10 elementos
-      });
       
     } catch (error) {
       const errorMessage = error instanceof ApiClientError 

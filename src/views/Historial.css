@@ -490,24 +490,123 @@
 }
 
 /* Dark mode support */
-@media (prefers-color-scheme: dark) {
+.dark-theme .historial-content {
+  color: #e6edf3;
+}
+
+.dark-theme .historial-title {
+  color: #e6edf3;
+}
+
+.dark-theme .historial-subtitle {
+  color: #8b949e;
+}
+
+.dark-theme .filters-section,
+.dark-theme .history-card,
+.dark-theme .stats-footer {
+  background-color: #21262d;
+  border-color: #30363d;
+}
+
+.dark-theme .search-input,
+.dark-theme .filter-select {
+  background-color: #0d1117;
+  border-color: #30363d;
+  color: #e6edf3;
+}
+
+.dark-theme .search-input:focus,
+.dark-theme .filter-select:focus {
+  border-color: #2f81f7;
+  box-shadow: 0 0 0 3px rgba(47, 129, 247, 0.1);
+}
+
+.dark-theme .card-header,
+.dark-theme .card-footer {
+  background-color: #262c36;
+  border-color: #30363d;
+}
+
+.dark-theme .code-text,
+.dark-theme .field-value {
+  color: #e6edf3;
+}
+
+.dark-theme .field-label,
+.dark-theme .scan-date {
+  color: #8b949e;
+}
+
+.dark-theme .results-info {
+  background-color: #262c36;
+  border-color: #30363d;
+  color: #8b949e;
+}
+
+.dark-theme .empty-state h3 {
+  color: #e6edf3;
+}
+
+.dark-theme .empty-state p {
+  color: #8b949e;
+}
+
+.dark-theme .stat-number {
+  color: #2f81f7;
+}
+
+.dark-theme .stat-label {
+  color: #8b949e;
+}
+
+.dark-theme .current-scan-banner {
+  background-color: #21262d;
+  border-color: #30363d;
+}
+
+.dark-theme .current-scan-label {
+  color: #8b949e;
+}
+
+.dark-theme .current-scan-code {
+  color: #e6edf3;
+}
+
+.dark-theme .current-scan-type {
+  background-color: #262c36;
+  color: #8b949e;
+}
+
+.dark-theme .current-scan-type.caja {
+  background-color: #1f2937;
+  color: #60a5fa;
+}
+
+.dark-theme .current-scan-type.pallet {
+  background-color: #1f2937;
+  color: #34d399;
+}
+
+/* Fallback for prefers-color-scheme */
+@media (prefers-color-scheme: light) {
   .historial-content {
-    color: #e6edf3;
+    color: var(--text-primary);
   }
-  
+
   .historial-title {
-    color: #e6edf3;
+    color: var(--text-primary);
   }
   
   .historial-subtitle {
-    color: #8b949e;
+    color: var(--text-secondary);
   }
   
   .filters-section,
   .history-card,
   .stats-footer {
-    background-color: #21262d;
-    border-color: #30363d;
+    background-color: var(--background-white);
+    border-color: var(--border-light);
   }
   
   .search-input,

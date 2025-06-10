@@ -102,9 +102,37 @@
 }
 
 /* Dark mode support */
-@media (prefers-color-scheme: dark) {
+.dark-theme .footer {
+  background-color: #21262d;
+  border-top-color: #30363d;
+}
+
+.dark-theme .nav-tab {
+  color: #8b949e;
+}
+
+.dark-theme .nav-tab:hover {
+  background-color: #30363d;
+  color: #e6edf3;
+}
+
+.dark-theme .nav-tab:active {
+  background-color: #262c36;
+}
+
+.dark-theme .nav-tab.active {
+  color: #2f81f7;
+  background-color: #0d2b52;
+}
+
+.dark-theme .nav-tab.active::after {
+  background-color: #2f81f7;
+}
+
+/* Fallback for prefers-color-scheme */
+@media (prefers-color-scheme: light) {
   .footer {
-    background-color: #21262d;
+    background-color: #f4f5f6;
     border-top-color: #30363d;
   }
   
@@ -118,12 +146,12 @@
   }
   
   .nav-tab:active {
-    background-color: #262c36;
+    background-color: #262c365f;
   }
   
   .nav-tab.active {
-    color: #2f81f7;
-    background-color: #0d2b52;
+    color: #152030;
+    background-color: #0d2b5279;
   }
   
   .nav-tab.active::after {

@@ -85,4 +85,54 @@ export interface IssueReportResult {
   issueNumber?: string;
   message?: string;
   [key: string]: any; // Para propiedades adicionales no esperadas
+}
+
+/**
+ * Register Box Request
+ */
+export interface RegisterBoxRequest {
+  codigo: string;
+  producto: string;
+  lote?: string;
+  fechaVencimiento?: string;
+  ubicacion?: string;
+  observaciones?: string;
+}
+
+/**
+ * Register Box Response
+ */
+export interface RegisterBoxResult {
+  id: string;
+  codigo: string;
+  mensaje: string;
+  fechaRegistro: string;
+  estado: 'registrado' | 'pendiente' | 'error';
+}
+
+/**
+ * Process Scan Request
+ */
+export interface ProcessScanRequest {
+  codigo: string;
+  ubicacion: string;
+  tipo?: 'BOX' | 'PALLET';
+  palletCodigo?: string;
+  scannedCodes?: string;
+}
+
+/**
+ * Process Scan Response
+ */
+export interface ProcessScanResult {
+  success: boolean;
+  message: string;
+  data?: {
+    codigo: string;
+    tipo: 'BOX' | 'PALLET';
+    ubicacion: string;
+    estado: string;
+    timestamp: string;
+    [key: string]: any;
+  };
 } 

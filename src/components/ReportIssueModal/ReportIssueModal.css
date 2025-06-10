@@ -454,7 +454,128 @@
 }
 
 /* Dark mode support */
-@media (prefers-color-scheme: dark) {
+.dark-theme .modal-container {
+  background-color: #21262d;
+  border: 1px solid #30363d;
+}
+
+.dark-theme .modal-header {
+  background-color: #262c36;
+  border-bottom-color: #30363d;
+}
+
+.dark-theme .modal-title {
+  color: #e6edf3;
+}
+
+.dark-theme .modal-close-btn {
+  color: #8b949e;
+}
+
+.dark-theme .modal-close-btn:hover:not(:disabled) {
+  background-color: #30363d;
+  color: #e6edf3;
+}
+
+.dark-theme .form-label {
+  color: #e6edf3;
+}
+
+.dark-theme .issue-type-btn,
+.dark-theme .priority-btn {
+  background-color: #0d1117;
+  border-color: #30363d;
+  color: #e6edf3;
+}
+
+.dark-theme .issue-type-btn:hover:not(:disabled),
+.dark-theme .priority-btn:hover:not(:disabled) {
+  background-color: #21262d;
+  border-color: #8b949e;
+}
+
+.dark-theme .issue-type-btn.active {
+  background-color: #1a2332;
+  border-color: #2f81f7;
+  color: #79c0ff;
+}
+
+.dark-theme .form-textarea,
+.dark-theme .form-input {
+  background-color: #0d1117;
+  border-color: #30363d;
+  color: #e6edf3;
+}
+
+.dark-theme .form-textarea:focus,
+.dark-theme .form-input:focus {
+  border-color: #2f81f7;
+  box-shadow: 0 0 0 3px rgba(47, 129, 247, 0.1);
+}
+
+.dark-theme .form-textarea:disabled,
+.dark-theme .form-input:disabled,
+.dark-theme .form-input:read-only {
+  background-color: #21262d;
+  color: #8b949e;
+}
+
+.dark-theme .code-info {
+  background-color: #262c36;
+  border-color: #30363d;
+}
+
+.dark-theme .code-display {
+  color: #79c0ff;
+}
+
+.dark-theme .code-note {
+  color: #8b949e;
+}
+
+.dark-theme .modal-actions {
+  border-top-color: #30363d;
+}
+
+.dark-theme .cancel-btn {
+  background-color: #21262d;
+  border-color: #30363d;
+  color: #8b949e;
+}
+
+.dark-theme .cancel-btn:hover:not(:disabled) {
+  background-color: #30363d;
+  border-color: #8b949e;
+  color: #e6edf3;
+}
+
+.dark-theme .priority-description {
+  color: #8b949e;
+}
+
+.dark-theme .success-content h3 {
+  color: #7ce383;
+}
+
+.dark-theme .success-content p {
+  color: #8b949e;
+}
+
+.dark-theme .form-textarea.error {
+  border-color: #dc3545;
+  box-shadow: 0 0 0 3px rgba(220, 53, 69, 0.15);
+}
+
+.dark-theme .validation-error {
+  color: #ff6b7a;
+}
+
+.dark-theme .character-count {
+  color: #8b949e;
+}
+
+/* Fallback for prefers-color-scheme */
+@media (prefers-color-scheme: light) {
   .modal-container {
     background-color: #21262d;
     border: 1px solid #30363d;

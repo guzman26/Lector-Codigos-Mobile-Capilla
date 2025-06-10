@@ -1,12 +1,18 @@
 import AppRoutes from './routes/AppRoutes';
 import { ScannedCodeProvider } from './context/ScannedCodeContext';
+import { ScanProvider } from './context/ScanContext';
+import { ThemeProvider } from './context/ThemeContext';
 import './App.css';
 
 function App() {
   return (
-    <ScannedCodeProvider>
-      <AppRoutes />
-    </ScannedCodeProvider>
+    <ThemeProvider>
+      <ScanProvider>
+        <ScannedCodeProvider>
+          <AppRoutes />
+        </ScannedCodeProvider>
+      </ScanProvider>
+    </ThemeProvider>
   );
 }
 
