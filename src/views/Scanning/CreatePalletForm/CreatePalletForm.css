@@ -140,8 +140,7 @@
 .form-group {
   display: flex;
   flex-direction: column;
-  gap: 1px;
-  margin-bottom: 0px;
+  gap: 8px;
 }
 
 .form-label {
