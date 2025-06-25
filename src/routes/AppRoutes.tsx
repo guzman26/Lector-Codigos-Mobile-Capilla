@@ -4,7 +4,7 @@ import Layout from '../components/Layout';
 import Dashboard from '../views/Dashboard';
 import Configuracion from '../views/Configuracion';
 import Historial from '../views/Historial';
-import RegistrarCaja from '../views/Scanning/RegistrarCajaNueva/RegistrarCaja';
+import RegistrarCaja from '../views/Scanning/RecibirCajaEnBodega/RecibirCaja';
 import ConsultarCodigo from '../views/Scanning/ConsultarCodigo/ConsultarCodigo';
 import CrearPallet from '../views/Scanning/CreatePalletForm/CreatePalletForm';
 

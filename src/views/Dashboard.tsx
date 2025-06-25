@@ -118,7 +118,7 @@ const Dashboard: React.FC = () => {
           className="action-btn primary"
           onClick={handleRegistrarCaja}
         >
-          <span className="btn-text">Escanear Nueva Caja</span>
+          <span className="btn-text">Recibir Pallets o Cajas</span>
         </button>
 
         <button 
@@ -135,12 +135,6 @@ const Dashboard: React.FC = () => {
           <span className="btn-text">Crear Pallet</span>
         </button>
         
-        <button 
-          className="action-btn"
-          onClick={() => navigate('/historial')}
-        >
-          <span className="btn-text">Ver Historial ({history.length})</span>
-        </button>
         
         <button className="action-btn"
         onClick={handleReportClick}>

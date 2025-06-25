@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useScanContext } from '../../../context/ScanContext';
 import { validateScannedCode } from '../../../utils/validators';
-import './RegistrarCaja.css';
+import './RecibirCaja.css';
 
 const RegistrarCaja: React.FC = () => {
   const navigate = useNavigate();
@@ -23,14 +23,9 @@ const RegistrarCaja: React.FC = () => {
       return;
     }
 
-    // Si no es una caja, no procesar
-    if (validation.type !== 'box') {
-      return;
-    }
-
     await processScan({
       codigo: codigo.trim(),
-      ubicacion: 'PACKING' // Por defecto PACKING
+      ubicacion: 'BODEGA'
     });
   };
 
@@ -71,7 +66,7 @@ const RegistrarCaja: React.FC = () => {
 
   const validation = validateScannedCode(codigo);
   const showValidationError = codigo.length > 0 && !validation.isValid;
-  const showTypeError = codigo.length > 0 && validation.isValid && validation.type !== 'box';
+  const showTypeError = codigo.length > 0 && validation.isValid && validation.type !== 'box' && validation.type !== 'pallet';
 
   return (
     <div className="registrar-caja-content">
@@ -79,7 +74,7 @@ const RegistrarCaja: React.FC = () => {
         <button onClick={handleBack} className="back-btn">
           ← Volver
         </button>
-        <h1>Escanear Nueva Caja</h1>
+        <h1>Recibir Pallets o Cajas</h1>
         <p>Escanea o ingresa el código de la nueva caja para PACKING</p>
         
         {/* Toggle Scanner Mode */}
@@ -184,8 +179,8 @@ const RegistrarCaja: React.FC = () => {
           <div className="info-box">
             <h4>Información</h4>
             <ul>
-              <li>• Ubicación: <strong>PACKING</strong> (automática)</li>
-              <li>• Solo códigos de caja (15 dígitos)</li>
+              <li>• Ubicación: <strong>BODEGA</strong> (automática)</li>
+              <li>• Solo códigos de caja (15 dígitos) o pallets (12 dígitos)</li>
               <li>• Presiona <kbd>Enter</kbd> para procesar</li>
               {scanBoxMode ? (
                 <li>• <strong>Modo Scanner:</strong> Campo siempre enfocado para escaneo consecutivo</li>
