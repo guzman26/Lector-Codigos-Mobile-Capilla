@@ -417,6 +417,150 @@ export const createPallet = async (codigo: string): Promise<ApiResponse<any>> =>
 };
 
 /**
+ * Gets detailed information from a pallet including box count
+ * Validates the pallet code before making the request
+ */
+export const getPalletDetails = async (
+  codigo: string
+): Promise<ApiResponse<{
+  codigo: string;
+  tipo: 'pallet';
+  estado: string;
+  ubicacion: string;
+  fechaCreacion: string;
+  numeroCajas: number;
+  cajas: Array<{
+    codigo: string;
+    producto: string;
+    estado: string;
+    fechaIngreso: string;
+  }>;
+  producto?: string;
+  lote?: string;
+  fechaVencimiento?: string;
+  responsable?: string;
+}>> => {
+  // Client-side validation
+  const validation = validateScannedCode(codigo);
+  
+  if (!validation.isValid) {
+    throw new apiClient.ApiClientError(
+      validation.errorMessage || 'Código inválido',
+      'VALIDATION_ERROR'
+    );
+  }
+
+  if (validation.type !== 'pallet') {
+    throw new apiClient.ApiClientError(
+      'El código debe ser de un pallet (12 dígitos)',
+      'VALIDATION_ERROR'
+    );
+  }
+
+  // Development mode: simulate API response
+  const shouldUseMockMode = import.meta.env.DEV && (
+    !import.meta.env.VITE_API_URL || 
+    import.meta.env.VITE_API_URL.includes('localhost') ||
+    import.meta.env.VITE_USE_MOCK_API === 'true'
+  );
+
+  if (shouldUseMockMode) {
+    console.log('🔧 Development Mode: Simulating getPalletDetails API call', {
+      codigo: codigo.trim(),
+      timestamp: new Date().toISOString()
+    });
+
+    // Simulate network delay
+    await new Promise(resolve => setTimeout(resolve, 1500));
+
+    // Generate mock data
+    const numeroCajas = Math.floor(Math.random() * 15) + 5; // Entre 5 y 20 cajas
+    const cajas = Array.from({ length: numeroCajas }, (_, i) => ({
+      codigo: `${Date.now()}${String(i).padStart(3, '0')}00`,
+      producto: `Producto ${String.fromCharCode(65 + (i % 26))}`,
+      estado: Math.random() > 0.1 ? 'activo' : 'dañado',
+      fechaIngreso: new Date(Date.now() - Math.random() * 7 * 24 * 60 * 60 * 1000).toISOString()
+    }));
+
+    return {
+      success: true,
+      data: {
+        codigo: codigo.trim(),
+        tipo: 'pallet',
+        estado: 'activo',
+        ubicacion: 'BODEGA',
+        fechaCreacion: new Date(Date.now() - Math.random() * 30 * 24 * 60 * 60 * 1000).toISOString(),
+        numeroCajas,
+        cajas,
+        producto: 'Producto de prueba',
+        lote: 'LT-' + Date.now().toString().slice(-6),
+        fechaVencimiento: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
+        responsable: 'Operador de turno'
+      },
+      message: 'Información del pallet obtenida correctamente'
+    };
+  }
+
+  // Make the API request
+  try {
+    console.log('📡 Making API request to:', `${import.meta.env.VITE_API_URL}/getPalletDetails`);
+    
+    const response = await apiClient.get<any>(
+      '/getPalletDetails',
+      { codigo: codigo.trim() }
+    );
+
+    console.log('✅ API Response received:', response);
+    return response;
+  } catch (error) {
+    console.error('❌ API Request failed:', error);
+    
+    // In development, if the real API fails, fall back to mock mode
+    if (import.meta.env.DEV) {
+      console.warn('🔄 Falling back to mock mode due to API failure');
+      
+      // Use the mock response above
+      const numeroCajas = Math.floor(Math.random() * 15) + 5;
+      const cajas = Array.from({ length: numeroCajas }, (_, i) => ({
+        codigo: `${Date.now()}${String(i).padStart(3, '0')}00`,
+        producto: `Producto ${String.fromCharCode(65 + (i % 26))}`,
+        estado: Math.random() > 0.1 ? 'activo' : 'dañado',
+        fechaIngreso: new Date(Date.now() - Math.random() * 7 * 24 * 60 * 60 * 1000).toISOString()
+      }));
+
+      return {
+        success: true,
+        data: {
+          codigo: codigo.trim(),
+          tipo: 'pallet',
+          estado: 'activo',
+          ubicacion: 'BODEGA',
+          fechaCreacion: new Date(Date.now() - Math.random() * 30 * 24 * 60 * 60 * 1000).toISOString(),
+          numeroCajas,
+          cajas,
+          producto: 'Producto de prueba (fallback)',
+          lote: 'LT-' + Date.now().toString().slice(-6),
+          fechaVencimiento: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
+          responsable: 'Operador de turno'
+        },
+        message: 'Información del pallet obtenida correctamente (fallback)'
+      };
+    }
+    
+    // Re-throw with more context if needed
+    if (error instanceof apiClient.ApiClientError) {
+      throw error;
+    }
+    
+    throw new apiClient.ApiClientError(
+      'Error al obtener información del pallet',
+      'REQUEST_FAILED',
+      error
+    );
+  }
+};
+
+/**
  * API endpoints object for easy access
  */
 export const endpoints = {
@@ -428,4 +572,5 @@ export const endpoints = {
   processScan,
   submitScan,
   createPallet,
+  getPalletDetails,
 } as const; 

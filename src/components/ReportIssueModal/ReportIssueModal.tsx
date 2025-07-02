@@ -10,7 +10,7 @@ interface ReportIssueModalProps {
 }
 
 interface IssueReport {
-  type: 'scanner' | 'network' | 'display' | 'hardware' | 'software' | 'other';
+  type: 'inventory' | 'damaged_goods' | 'wrong_product' | 'missing_items' | 'quality_issue' | 'access_problem' | 'equipment_failure' | 'process_error' | 'safety_concern' | 'scanner' | 'network' | 'other';
   priority: 'low' | 'medium' | 'high' | 'critical';
   description: string;
   lastScannedCode?: string;
@@ -21,7 +21,7 @@ const ReportIssueModal: React.FC<ReportIssueModalProps> = ({ isOpen, onClose }) 
   const { data: lastScan } = useScannedCodeContext();
   
   const [formData, setFormData] = useState<IssueReport>({
-    type: 'scanner',
+    type: 'inventory',
     priority: 'medium',
     description: '',
     lastScannedCode: lastScan?.codigo || '',
@@ -34,11 +34,17 @@ const ReportIssueModal: React.FC<ReportIssueModalProps> = ({ isOpen, onClose }) 
   const [validationError, setValidationError] = useState<string>('');
 
   const issueTypes = [
+    { value: 'inventory', label: 'Discrepancia de Inventario', icon: '📊' },
+    { value: 'damaged_goods', label: 'Productos Dañados', icon: '📦' },
+    { value: 'wrong_product', label: 'Producto Incorrecto', icon: '🏷️' },
+    { value: 'missing_items', label: 'Elementos Faltantes', icon: '❌' },
+    { value: 'quality_issue', label: 'Problema de Calidad', icon: '⚠️' },
+    { value: 'access_problem', label: 'Problema de Acceso', icon: '🚪' },
+    { value: 'equipment_failure', label: 'Falla de Equipo', icon: '⚙️' },
+    { value: 'process_error', label: 'Error en Proceso', icon: '🔄' },
+    { value: 'safety_concern', label: 'Problema de Seguridad', icon: '🛡️' },
     { value: 'scanner', label: 'Problema con Escáner', icon: '📱' },
     { value: 'network', label: 'Problema de Conexión', icon: '🌐' },
-    { value: 'display', label: 'Problema de Pantalla', icon: '🖥️' },
-    { value: 'hardware', label: 'Fallo de Hardware', icon: '⚙️' },
-    { value: 'software', label: 'Error de Software', icon: '💻' },
     { value: 'other', label: 'Otro Problema', icon: '❓' }
   ];
 
@@ -134,7 +140,7 @@ Reportado el: ${new Date().toLocaleString('es-ES')}
   const handleClose = () => {
     if (!isSubmitting) {
       setFormData({
-        type: 'scanner',
+        type: 'inventory',
         priority: 'medium',
         description: '',
         lastScannedCode: lastScan?.codigo || '',

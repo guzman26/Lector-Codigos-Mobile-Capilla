@@ -2,12 +2,18 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useScanContext } from '../../../context/ScanContext';
 import { validateScannedCode } from '../../../utils/validators';
+import { PalletConfirmationModal } from '../../../components/PalletConfirmationModal';
+import ReportIssueModal from '../../../components/ReportIssueModal';
 import './RecibirCaja.css';
 
 const RegistrarCaja: React.FC = () => {
   const navigate = useNavigate();
   const [codigo, setCodigo] = useState('');
   const [scanBoxMode, setScanBoxMode] = useState(false);
+  const [showPalletModal, setShowPalletModal] = useState(false);
+  const [showReportModal, setShowReportModal] = useState(false);
+  const [pendingPalletCode, setPendingPalletCode] = useState('');
+  const [reportReason, setReportReason] = useState('');
   const inputRef = useRef<HTMLInputElement>(null);
   const { data, loading, error, processScan, reset } = useScanContext();
 
@@ -23,6 +29,14 @@ const RegistrarCaja: React.FC = () => {
       return;
     }
 
+    // Si es un pallet, mostrar modal de confirmación
+    if (validation.type === 'pallet') {
+      setPendingPalletCode(codigo.trim());
+      setShowPalletModal(true);
+      return;
+    }
+
+    // Si es una caja, procesar directamente
     await processScan({
       codigo: codigo.trim(),
       ubicacion: 'BODEGA'
@@ -41,6 +55,39 @@ const RegistrarCaja: React.FC = () => {
 
   const toggleScanBoxMode = () => {
     setScanBoxMode(prev => !prev);
+  };
+
+  const handlePalletConfirm = async () => {
+    // Procesar el pallet normalmente
+    await processScan({
+      codigo: pendingPalletCode,
+      ubicacion: 'BODEGA'
+    });
+    
+    // Limpiar estados
+    setPendingPalletCode('');
+    setShowPalletModal(false);
+  };
+
+  const handlePalletReportIssue = (reason?: string) => {
+    setReportReason(reason || 'Problema operacional con pallet');
+    setShowPalletModal(false);
+    setShowReportModal(true);
+  };
+
+  const handleReportModalClose = () => {
+    setShowReportModal(false);
+    setReportReason('');
+    setPendingPalletCode('');
+    // Limpiar el código escaneado para permitir nuevo escaneo
+    setCodigo('');
+  };
+
+  const handlePalletModalClose = () => {
+    setShowPalletModal(false);
+    setPendingPalletCode('');
+    // Limpiar el código escaneado para permitir nuevo escaneo
+    setCodigo('');
   };
 
   // Mantener foco en input cuando está en modo scanner
@@ -75,7 +122,7 @@ const RegistrarCaja: React.FC = () => {
           ← Volver
         </button>
         <h1>Recibir Pallets o Cajas</h1>
-        <p>Escanea o ingresa el código de la nueva caja para PACKING</p>
+        <p>Escanea o ingresa el código de caja o pallet para recepción en BODEGA</p>
         
         {/* Toggle Scanner Mode */}
         <div className="scanner-mode-toggle">
@@ -131,7 +178,7 @@ const RegistrarCaja: React.FC = () => {
         <div className="form-section">
           <div className="form-group">
             <label htmlFor="codigo" className="form-label">
-              Código de Caja
+              Código de Caja o Pallet
             </label>
             <input
               ref={inputRef}
@@ -150,7 +197,7 @@ const RegistrarCaja: React.FC = () => {
                   }, 100);
                 }
               }}
-              placeholder={scanBoxMode ? "Escanea códigos consecutivamente..." : "Escanea o ingresa código de 15 dígitos"}
+              placeholder={scanBoxMode ? "Escanea códigos consecutivamente..." : "Escanea código de caja (15 dig.) o pallet (12 dig.)"}
               className={`form-input code-input ${showValidationError || showTypeError ? 'error' : ''} ${scanBoxMode ? 'scanner-mode' : ''}`}
               disabled={loading}
               autoFocus
@@ -165,7 +212,7 @@ const RegistrarCaja: React.FC = () => {
 
             {showTypeError && (
               <span className="validation-error">
-                Este código es de un pallet. Solo se permiten códigos de caja (15 dígitos).
+                Tipo de código no reconocido. Use códigos de caja (15 dígitos) o pallet (12 dígitos).
               </span>
             )}
 
@@ -174,13 +221,20 @@ const RegistrarCaja: React.FC = () => {
                 ✓ Código válido - Presiona Enter para procesar
               </span>
             )}
+
+            {codigo.length > 0 && validation.isValid && validation.type === 'pallet' && (
+              <span className="validation-success">
+                ✓ Código de pallet válido - Presiona Enter para confirmar recepción
+              </span>
+            )}
           </div>
 
           <div className="info-box">
             <h4>Información</h4>
             <ul>
               <li>• Ubicación: <strong>BODEGA</strong> (automática)</li>
-              <li>• Solo códigos de caja (15 dígitos) o pallets (12 dígitos)</li>
+              <li>• Códigos de caja (15 dígitos): procesamiento directo</li>
+              <li>• Códigos de pallet (12 dígitos): requieren confirmación</li>
               <li>• Presiona <kbd>Enter</kbd> para procesar</li>
               {scanBoxMode ? (
                 <li>• <strong>Modo Scanner:</strong> Campo siempre enfocado para escaneo consecutivo</li>
@@ -210,6 +264,14 @@ const RegistrarCaja: React.FC = () => {
               >
                 Caja: 987654321098765
               </button>
+              <button
+                type="button"
+                onClick={() => setCodigo('123456789012')}
+                className="test-btn"
+                disabled={loading}
+              >
+                Pallet: 123456789012
+              </button>
             </div>
           </div>
         </div>
@@ -218,9 +280,24 @@ const RegistrarCaja: React.FC = () => {
       {loading && (
         <div className="loading-overlay">
           <div className="loading-spinner"></div>
-          <p>Procesando caja...</p>
+          <p>Procesando...</p>
         </div>
       )}
+
+      {/* Modal de confirmación de pallet */}
+      <PalletConfirmationModal
+        isOpen={showPalletModal}
+        palletCode={pendingPalletCode}
+        onConfirm={handlePalletConfirm}
+        onReportIssue={handlePalletReportIssue}
+        onClose={handlePalletModalClose}
+      />
+
+      {/* Modal de reportar problemas */}
+      <ReportIssueModal
+        isOpen={showReportModal}
+        onClose={handleReportModalClose}
+      />
     </div>
   );
 };
