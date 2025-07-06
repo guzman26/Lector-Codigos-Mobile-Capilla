@@ -6,6 +6,7 @@ import { CreatePalletFormProps } from './PalletForm.types';
 import { usePalletForm } from '../../../hooks/usePalletForm';
 import { PalletCodePreview } from './PalletCodePreview';
 import { TURNO_OPTIONS, CALIBRE_OPTIONS, FORMATO_OPTIONS } from './PalletFormConstants';
+import { Button } from '../../../components/ui';
 import './CreatePalletForm.css';
 
 /**
@@ -172,17 +173,17 @@ export const CreatePalletForm: React.FC<CreatePalletFormProps> = ({
       )}
         
         <div className="form-buttons">
-          <button 
-            type="button" 
-            className="btn btn-secondary" 
+          <Button
+            type="button"
+            className="btn btn-secondary"
             onClick={handleCancel}
             disabled={isSubmitting}
           >
             Cancelar
-          </button>
-          
-          <button 
-            type="submit" 
+          </Button>
+
+          <Button
+            type="submit"
             className={`btn btn-primary ${isSubmitting ? 'loading' : ''}`}
             disabled={isSubmitting || !generatedCode}
           >
@@ -194,7 +195,7 @@ export const CreatePalletForm: React.FC<CreatePalletFormProps> = ({
             ) : (
               'Crear Pallet'
             )}
-          </button>
+          </Button>
         </div>
       </form>
     </div>

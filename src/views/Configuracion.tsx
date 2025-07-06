@@ -1,5 +1,6 @@
 import React from 'react';
 import { useTheme } from '../context/ThemeContext';
+import { Button } from '../components/ui';
 import './Configuracion.css';
 
 const Configuracion: React.FC = () => {
@@ -36,13 +37,13 @@ const Configuracion: React.FC = () => {
             <label className="config-label">Tema:</label>
             <div className="theme-toggle-container">
               <span className="theme-label">Modo claro</span>
-              <button 
+              <Button
                 className={`theme-toggle ${isDarkMode ? 'active' : ''}`}
                 onClick={toggleTheme}
                 aria-label={`Cambiar a modo ${isDarkMode ? 'claro' : 'oscuro'}`}
               >
                 <div className="theme-toggle-thumb"></div>
-              </button>
+              </Button>
               <span className="theme-label">Modo oscuro</span>
             </div>
           </div>
@@ -69,12 +70,12 @@ const Configuracion: React.FC = () => {
         </div>
 
         <div className="config-actions">
-          <button className="config-btn primary">
+          <Button className="config-btn primary">
             Guardar Configuración
-          </button>
-          <button className="config-btn secondary">
+          </Button>
+          <Button className="config-btn secondary">
             Restaurar Defaults
-          </button>
+          </Button>
         </div>
       </div>
     </div>

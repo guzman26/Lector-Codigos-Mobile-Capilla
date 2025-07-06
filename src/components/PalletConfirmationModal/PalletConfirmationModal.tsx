@@ -130,9 +130,9 @@ const PalletConfirmationModal: React.FC<PalletConfirmationModalProps> = ({
             <div className="pallet-error">
               <span className="error-icon">⚠️</span>
               <p>{error}</p>
-              <button onClick={fetchPalletDetails} className="retry-btn">
+              <Button onClick={fetchPalletDetails} className="retry-btn">
                 Reintentar
-              </button>
+              </Button>
             </div>
           )}
 

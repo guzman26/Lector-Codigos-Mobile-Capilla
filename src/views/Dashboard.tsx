@@ -4,6 +4,7 @@ import { useScannedCodeContext } from '../context/ScannedCodeContext';
 import { useScanContext } from '../context/ScanContext';
 import { formatCodeForDisplay } from '../api';
 import ReportIssueModal from '../components/ReportIssueModal/ReportIssueModal';
+import { Button } from '../components/ui';
 import './Dashboard.css';
 
 const Dashboard: React.FC = () => {
@@ -114,32 +115,31 @@ const Dashboard: React.FC = () => {
     <div className="dashboard-content">
       {/* Sección de Acciones */}
       <div className="actions-section">
-        <button 
+        <Button
           className="action-btn primary"
           onClick={handleRegistrarCaja}
         >
           <span className="btn-text">Recibir Pallets o Cajas</span>
-        </button>
+        </Button>
 
-        <button 
+        <Button
           className="action-btn"
           onClick={() => navigate('/consultar-codigo')}
         >
           <span className="btn-text">Consultar Código</span>
-        </button>
+        </Button>
 
-        <button 
+        <Button
           className="action-btn"
           onClick={() => navigate('/crear-pallet')}
         >
           <span className="btn-text">Crear Pallet</span>
-        </button>
-        
-        
-        <button className="action-btn"
-        onClick={handleReportClick}>
+        </Button>
+
+
+        <Button className="action-btn" onClick={handleReportClick}>
           <span className="btn-text">Registrar Problema</span>
-        </button>
+        </Button>
       </div>
 
       {/* Último Código Procesado */}

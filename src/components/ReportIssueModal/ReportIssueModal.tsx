@@ -191,7 +191,7 @@ Reportado el: ${new Date().toLocaleString('es-ES')}
               <label className="form-label">Tipo de Problema</label>
               <div className="issue-types-grid">
                 {issueTypes.map(type => (
-                  <button
+                  <Button
                     key={type.value}
                     type="button"
                     className={`issue-type-btn ${formData.type === type.value ? 'active' : ''}`}
@@ -200,7 +200,7 @@ Reportado el: ${new Date().toLocaleString('es-ES')}
                   >
                     <span className="issue-icon">{type.icon}</span>
                     <span className="issue-label">{type.label}</span>
-                  </button>
+                  </Button>
                 ))}
               </div>
             </div>
@@ -209,7 +209,7 @@ Reportado el: ${new Date().toLocaleString('es-ES')}
               <label className="form-label">Prioridad</label>
               <div className="priority-grid">
                 {priorityLevels.map(priority => (
-                  <button
+                  <Button
                     key={priority.value}
                     type="button"
                     className={`priority-btn ${formData.priority === priority.value ? 'active' : ''}`}
@@ -224,7 +224,7 @@ Reportado el: ${new Date().toLocaleString('es-ES')}
                       {priority.label}
                     </span>
                     <span className="priority-description">{priority.description}</span>
-                  </button>
+                  </Button>
                 ))}
               </div>
             </div>

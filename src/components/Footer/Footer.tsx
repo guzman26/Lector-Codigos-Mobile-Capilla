@@ -1,5 +1,6 @@
 import React from 'react';
 import './Footer.css';
+import { Button } from '../ui';
 
 interface NavTab {
   id: string;
@@ -22,7 +23,7 @@ const Footer: React.FC<FooterProps> = ({ tabs, onTabClick }) => {
     <footer className="footer">
       <nav className="footer-nav">
         {tabs.map((tab) => (
-          <button
+          <Button
             key={tab.id}
             className={`nav-tab ${tab.isActive ? 'active' : ''}`}
             onClick={() => handleTabClick(tab.id)}
@@ -33,7 +34,7 @@ const Footer: React.FC<FooterProps> = ({ tabs, onTabClick }) => {
               {tab.icon}
             </span>
             <span className="nav-label">{tab.label}</span>
-          </button>
+          </Button>
         ))}
       </nav>
     </footer>

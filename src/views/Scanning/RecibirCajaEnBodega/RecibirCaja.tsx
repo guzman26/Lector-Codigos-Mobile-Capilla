@@ -4,6 +4,7 @@ import { useScanContext } from '../../../context/ScanContext';
 import { validateScannedCode } from '../../../utils/validators';
 import { PalletConfirmationModal } from '../../../components/PalletConfirmationModal';
 import ReportIssueModal from '../../../components/ReportIssueModal';
+import { Button } from '../../../components/ui';
 import './RecibirCaja.css';
 
 const RegistrarCaja: React.FC = () => {
@@ -118,15 +119,15 @@ const RegistrarCaja: React.FC = () => {
   return (
     <div className="registrar-caja-content">
       <div className="registrar-caja-header">
-        <button onClick={handleBack} className="back-btn">
+        <Button onClick={handleBack} className="back-btn">
           ← Volver
-        </button>
+        </Button>
         <h1>Recibir Pallets o Cajas</h1>
         <p>Escanea o ingresa el código de caja o pallet para recepción en BODEGA</p>
         
         {/* Toggle Scanner Mode */}
         <div className="scanner-mode-toggle">
-          <button 
+          <Button
             onClick={toggleScanBoxMode}
             className={`toggle-btn ${scanBoxMode ? 'active' : ''}`}
             disabled={loading}
@@ -137,7 +138,7 @@ const RegistrarCaja: React.FC = () => {
             <span className="toggle-text">
               {scanBoxMode ? 'Modo Scanner: ON' : 'Modo Scanner: OFF'}
             </span>
-          </button>
+          </Button>
           {scanBoxMode && (
             <p className="scanner-mode-info">
               🔍 Modo scanner activo - El campo permanecerá enfocado para escaneo consecutivo
@@ -151,7 +152,7 @@ const RegistrarCaja: React.FC = () => {
           <div className="error-message">
             <span className="error-icon">⚠️</span>
             <span className="error-text">{error}</span>
-            <button onClick={reset} className="error-close">✕</button>
+            <Button onClick={reset} className="error-close">✕</Button>
           </div>
         </div>
       )}
@@ -248,30 +249,30 @@ const RegistrarCaja: React.FC = () => {
           <div className="test-codes">
             <p>Códigos de prueba:</p>
             <div className="test-buttons">
-              <button
+              <Button
                 type="button"
                 onClick={() => setCodigo('123456789012345')}
                 className="test-btn"
                 disabled={loading}
               >
                 Caja: 123456789012345
-              </button>
-              <button
+              </Button>
+              <Button
                 type="button"
                 onClick={() => setCodigo('987654321098765')}
                 className="test-btn"
                 disabled={loading}
               >
                 Caja: 987654321098765
-              </button>
-              <button
+              </Button>
+              <Button
                 type="button"
                 onClick={() => setCodigo('123456789012')}
                 className="test-btn"
                 disabled={loading}
               >
                 Pallet: 123456789012
-              </button>
+              </Button>
             </div>
           </div>
         </div>

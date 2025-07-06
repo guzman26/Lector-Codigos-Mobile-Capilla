@@ -4,6 +4,7 @@ import { validateScannedCode } from '../../../utils/validators';
 import './ConsultarCodigo.css';
 import { useNavigate } from 'react-router-dom';
 import { useScannedCodeContext } from '../../../context/ScannedCodeContext';
+import { Button } from '../../../components/ui';
 
 interface ConsultaResult extends ScannedCodeInfo {
   timestamp: string;
@@ -139,26 +140,26 @@ const ConsultarCodigo: React.FC = () => {
     if (item.tipo === 'caja') {
       return (
         <div className="action-buttons">
-          <button className="btn-action btn-move">
+          <Button className="btn-action btn-move">
             📦 Mover Caja
-          </button>
-          <button className="btn-action btn-details">
+          </Button>
+          <Button className="btn-action btn-details">
             ℹ️ Ver Detalles
-          </button>
+          </Button>
         </div>
       );
     } else {
       return (
         <div className="action-buttons">
-          <button className="btn-action btn-move">
+          <Button className="btn-action btn-move">
             🚛 Mover Pallet
-          </button>
-          <button className="btn-action btn-contents">
+          </Button>
+          <Button className="btn-action btn-contents">
             📋 Ver Contenido
-          </button>
-          <button className="btn-action btn-details">
+          </Button>
+          <Button className="btn-action btn-details">
             ℹ️ Ver Detalles
-          </button>
+          </Button>
         </div>
       );
     }
@@ -167,9 +168,9 @@ const ConsultarCodigo: React.FC = () => {
   return (
     <div className="consultar-codigo">
       <div className="header">
-        <button onClick={handleBack} className="back-btn">
+        <Button onClick={handleBack} className="back-btn">
           ← Volver
-        </button>
+        </Button>
         <h2>🔍 Consultar Código</h2>
         <p>Ingresa un código para consultar su información</p>
       </div>
@@ -188,13 +189,13 @@ const ConsultarCodigo: React.FC = () => {
             disabled={loading}
             autoFocus
           />
-          <button 
-            type="submit" 
+          <Button
+            type="submit"
             className="search-button"
             disabled={loading || !codigo.trim()}
           >
             {loading ? '🔄' : '🔍'}
-          </button>
+          </Button>
         </div>
         
         {error && (

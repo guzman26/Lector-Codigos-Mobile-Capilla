@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useScannedCodeContext } from '../context/ScannedCodeContext';
 import { formatCodeForDisplay } from '../api';
+import { Button } from '../components/ui';
 import './Historial.css';
 
 const Historial: React.FC = () => {
@@ -97,12 +98,12 @@ const Historial: React.FC = () => {
         </div>
 
         {history.length > 0 && (
-          <button 
+          <Button
             onClick={clearHistory}
             className="clear-history-btn"
           >
             Limpiar Historial
-          </button>
+          </Button>
         )}
       </div>
 
@@ -111,7 +112,7 @@ const Historial: React.FC = () => {
         <div className="results-info">
           {filteredHistory.length} de {history.length} resultados
           {filteredHistory.length !== history.length && (
-            <button 
+            <Button
               onClick={() => {
                 setSearchTerm('');
                 setFilterType('all');
@@ -120,7 +121,7 @@ const Historial: React.FC = () => {
               className="clear-filters-btn"
             >
               Limpiar filtros
-            </button>
+            </Button>
           )}
         </div>
       ) : null}
@@ -185,13 +186,13 @@ const Historial: React.FC = () => {
               </div>
 
               <div className="card-footer">
-                <button
+                <Button
                   onClick={() => handleRescan(item.codigo)}
                   disabled={loading}
                   className="rescan-btn"
                 >
                   {loading ? '⏳' : '🔄'} Re-escanear
-                </button>
+                </Button>
                 
                 <span className="scan-date">
                   {new Date(item.fechaCreacion).toLocaleDateString('es-ES', {
