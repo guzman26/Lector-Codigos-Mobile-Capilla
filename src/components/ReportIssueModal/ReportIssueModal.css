@@ -1,17 +1,4 @@
 /* ReportIssueModal Styles */
-.modal-overlay {
-  position: fixed;
-  inset: 0;
-  background-color: rgba(0, 0, 0, 0.3);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 1000;
-  padding: var(--spacing-md);
-  backdrop-filter: blur(8px);
-  animation: fadeIn 0.3s ease;
-}
-
 .modal-container {
   background-color: var(--background-white);
   border-radius: 16px;
@@ -21,19 +8,6 @@
   overflow-y: auto;
   box-shadow: 0 4px 10px var(--shadow-medium);
   position: relative;
-  transform: scale(0.95);
-  opacity: 0;
-  transition: transform 0.3s ease, opacity 0.3s ease;
-}
-
-.modal-overlay.open .modal-container {
-  transform: scale(1);
-  opacity: 1;
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
 }
 
 /* Modal Header */
@@ -386,10 +360,6 @@
 
 /* Responsive Design */
 @media (max-width: 768px) {
-  .modal-overlay {
-    padding: 0.5rem;
-  }
-  
   .modal-container {
     max-height: 95vh;
   }
@@ -435,11 +405,6 @@
 }
 
 @media (max-width: 480px) {
-  .modal-overlay {
-    padding: 0;
-    align-items: stretch;
-  }
-  
   .modal-container {
     border-radius: 0;
     max-height: 100vh;
