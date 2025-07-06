@@ -121,6 +121,9 @@ input, select, textarea {
   font-family: inherit;
   font-size: 0.875rem;
   color: var(--text-primary);
+  ::placeholder {
+    color: var(--placeholder-gray);
+  }
   min-height: var(--touch-size);
   transition: border-color 0.15s ease;
 }

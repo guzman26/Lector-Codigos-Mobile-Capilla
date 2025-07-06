@@ -1,7 +1,7 @@
 .pallet-modal-container {
-  background: white;
-  border-radius: 16px;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  background: var(--background-white);
+  border-radius: var(--modal-radius);
+  box-shadow: 0 20px 60px var(--shadow-dark);
   max-width: 700px;
   width: 90%;
   max-height: 90vh;
@@ -9,9 +9,9 @@
 }
 
 .pallet-modal-header {
-  background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
-  color: white;
-  padding: 24px;
+  background: var(--color-accent);
+  color: var(--background-white);
+  padding: var(--spacing-md);
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -26,21 +26,20 @@
 .pallet-modal-close {
   background: rgba(255, 255, 255, 0.2);
   border: none;
-  color: white;
+  color: var(--background-white);
   width: 36px;
   height: 36px;
   border-radius: 50%;
   font-size: 18px;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: opacity 0.2s ease;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
 .pallet-modal-close:hover:not(:disabled) {
-  background: rgba(255, 255, 255, 0.3);
-  transform: scale(1.1);
+  opacity: 0.7;
 }
 
 .pallet-modal-close:disabled {
@@ -49,7 +48,7 @@
 }
 
 .pallet-modal-content {
-  padding: 32px;
+  padding: var(--spacing-lg);
   max-height: calc(90vh - 120px);
   overflow-y: auto;
 }
@@ -62,8 +61,8 @@
 .loading-spinner {
   width: 40px;
   height: 40px;
-  border: 4px solid #f3f3f3;
-  border-top: 4px solid #3498db;
+  border: 4px solid var(--border-dark);
+  border-top: 4px solid var(--color-accent);
   border-radius: 50%;
   animation: spin 1s linear infinite;
   margin: 0 auto 16px;
@@ -75,7 +74,7 @@
 }
 
 .pallet-loading p {
-  color: #666;
+  color: var(--text-secondary);
   font-size: 16px;
   margin: 0;
 }
@@ -83,7 +82,7 @@
 .pallet-error {
   text-align: center;
   padding: 40px 20px;
-  color: #e74c3c;
+  color: var(--color-accent);
 }
 
 .pallet-error .error-icon {
@@ -98,20 +97,19 @@
 }
 
 .retry-btn {
-  background: #3498db;
-  color: white;
+  background: var(--color-accent);
+  color: var(--background-white);
   border: none;
   padding: 12px 24px;
-  border-radius: 8px;
+  border-radius: var(--corner-radius);
   font-size: 14px;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: opacity 0.2s ease;
 }
 
 .retry-btn:hover {
-  background: #2980b9;
-  transform: translateY(-2px);
+  opacity: 0.8;
 }
 
 .pallet-details {
@@ -124,15 +122,15 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 20px;
-  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-  border-radius: 12px;
-  border-left: 5px solid #3498db;
+  padding: var(--spacing-md);
+  background: var(--background-light-gray);
+  border-radius: var(--corner-radius);
+  border-left: 4px solid var(--color-accent);
 }
 
 .pallet-code {
   font-size: 18px;
-  color: #2c3e50;
+  color: var(--text-primary);
 }
 
 .pallet-status {
@@ -185,10 +183,10 @@
 }
 
 .cajas-summary {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
-  border-radius: 12px;
-  padding: 24px;
+  background: var(--color-accent);
+  color: var(--background-white);
+  border-radius: var(--corner-radius);
+  padding: var(--spacing-md);
   text-align: center;
 }
 
@@ -237,10 +235,10 @@
 
 .confirmation-question {
   text-align: center;
-  padding: 24px;
+  padding: var(--spacing-md);
   background: #fff3cd;
   border: 2px solid #ffc107;
-  border-radius: 12px;
+  border-radius: var(--corner-radius);
 }
 
 .confirmation-question h3 {
@@ -263,21 +261,20 @@
 }
 
 .confirm-btn {
-  background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
-  color: white;
+  background: var(--color-accent);
+  color: var(--background-white);
   border: none;
-  padding: 16px 24px;
-  border-radius: 12px;
+  padding: var(--spacing-md);
+  border-radius: var(--corner-radius);
   font-size: 16px;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.2s ease;
-  box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
+  transition: opacity 0.2s ease;
+  box-shadow: 0 4px 12px var(--shadow-medium);
 }
 
 .confirm-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(40, 167, 69, 0.4);
+  opacity: 0.8;
 }
 
 .issue-buttons {
@@ -287,15 +284,15 @@
 }
 
 .issue-btn {
-  background: #fff;
-  border: 2px solid #dee2e6;
-  color: #495057;
+  background: var(--background-white);
+  border: 2px solid var(--color-border);
+  color: var(--text-primary);
   padding: 12px 16px;
-  border-radius: 8px;
+  border-radius: var(--corner-radius);
   font-size: 14px;
   font-weight: 500;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: opacity 0.2s ease;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -304,32 +301,31 @@
 }
 
 .issue-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  opacity: 0.8;
 }
 
 .issue-btn.count-issue:hover {
-  border-color: #dc3545;
-  color: #dc3545;
-  background: #f8f9fa;
+  border-color: var(--color-accent);
+  color: var(--color-accent);
+  background: var(--background-light-gray);
 }
 
 .issue-btn.damage-issue:hover {
-  border-color: #fd7e14;
-  color: #fd7e14;
-  background: #f8f9fa;
+  border-color: var(--color-accent);
+  color: var(--color-accent);
+  background: var(--background-light-gray);
 }
 
 .issue-btn.product-issue:hover {
-  border-color: #6f42c1;
-  color: #6f42c1;
-  background: #f8f9fa;
+  border-color: var(--color-accent);
+  color: var(--color-accent);
+  background: var(--background-light-gray);
 }
 
 .issue-btn.other-issue:hover {
-  border-color: #6c757d;
-  color: #6c757d;
-  background: #f8f9fa;
+  border-color: var(--color-accent);
+  color: var(--color-accent);
+  background: var(--background-light-gray);
 }
 
 /* Responsive Design */

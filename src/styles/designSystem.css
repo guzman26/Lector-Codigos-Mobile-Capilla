@@ -11,6 +11,9 @@
   --color-surface: #f2f2f7;
   --color-accent: #007aff;
   --color-text: #1c1c1e;
+  --color-border: #c7c7cc;
+  --color-placeholder: #8e8e93;
+  --text-secondary: #3c3c43;
   --spacing-sm: 8px;
   --spacing-md: 16px;
   --spacing-lg: 24px;
@@ -23,10 +26,11 @@
   --text-primary: var(--color-text);
   --background-white: var(--color-bg);
   --background-light-gray: var(--color-surface);
+  --placeholder-gray: var(--color-placeholder);
   --btn-primary-bg: var(--color-accent);
-  --input-border: #d0d5dd;
+  --input-border: var(--color-border);
   --btn-secondary-bg: #f0f0f0;
-  --border-dark: #c7c7cc;
+  --border-dark: var(--color-border);
   --industrial-primary: var(--color-accent);
   --industrial-primary-dark: #0057d9;
   --industrial-success: #34c759;
