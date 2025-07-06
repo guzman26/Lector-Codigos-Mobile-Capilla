@@ -3,6 +3,7 @@ import { useScannedCodeContext } from '../../context/ScannedCodeContext';
 import { submitIssueReport } from '../../api/endpoints';
 import { validateIssueDescription } from '../../utils/validators';
 import './ReportIssueModal.css';
+import { Modal, Button } from '../ui';
 
 interface ReportIssueModalProps {
   isOpen: boolean;
@@ -153,26 +154,22 @@ Reportado el: ${new Date().toLocaleString('es-ES')}
     }
   };
 
-  const handleOverlayClick = (e: React.MouseEvent) => {
-    if (e.target === e.currentTarget) {
-      handleClose();
-    }
-  };
 
   if (!isOpen) return null;
 
   return (
-    <div className="modal-overlay" onClick={handleOverlayClick}>
+    <Modal isOpen={isOpen} onClose={handleClose}>
       <div className="modal-container">
         <div className="modal-header">
           <h2 className="modal-title">🚨 Reportar Problema</h2>
-          <button 
+          <Button
             className="modal-close-btn"
             onClick={handleClose}
             disabled={isSubmitting}
+            aria-label="Cerrar"
           >
             ✕
-          </button>
+          </Button>
         </div>
 
         {submitSuccess ? (
@@ -279,15 +276,15 @@ Reportado el: ${new Date().toLocaleString('es-ES')}
             </div>
 
             <div className="modal-actions">
-              <button
+              <Button
                 type="button"
                 className="cancel-btn"
                 onClick={handleClose}
                 disabled={isSubmitting}
               >
                 Cancelar
-              </button>
-              <button
+              </Button>
+              <Button
                 type="submit"
                 className="submit-btn"
                 disabled={isSubmitting || !formData.description.trim()}
@@ -300,12 +297,12 @@ Reportado el: ${new Date().toLocaleString('es-ES')}
                 ) : (
                   'Enviar Reporte'
                 )}
-              </button>
+              </Button>
             </div>
           </form>
         )}
       </div>
-    </div>
+    </Modal>
   );
 };
 

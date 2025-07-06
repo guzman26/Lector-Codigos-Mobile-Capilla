@@ -1,0 +1,29 @@
+.overlay {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  backdrop-filter: blur(8px);
+  padding: var(--spacing-md);
+}
+
+.container {
+  background-color: var(--background-white);
+  border-radius: var(--modal-radius);
+  width: 100%;
+  max-width: 600px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 4px 10px var(--shadow-medium);
+  transform: scale(0.96);
+  opacity: 0;
+  transition: transform 0.3s ease, opacity 0.3s ease;
+}
+
+.open .container {
+  transform: scale(1);
+  opacity: 1;
+}

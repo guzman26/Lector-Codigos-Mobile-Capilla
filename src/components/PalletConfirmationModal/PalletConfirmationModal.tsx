@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { getPalletDetails } from '../../api/endpoints';
 import './PalletConfirmationModal.css';
+import { Modal, Button } from '../ui';
 
 interface PalletDetails {
   codigo: string;
@@ -83,11 +84,6 @@ const PalletConfirmationModal: React.FC<PalletConfirmationModalProps> = ({
     onClose();
   };
 
-  const handleOverlayClick = (e: React.MouseEvent) => {
-    if (e.target === e.currentTarget) {
-      handleClose();
-    }
-  };
 
   const formatDate = (dateString: string) => {
     try {
@@ -108,17 +104,18 @@ const PalletConfirmationModal: React.FC<PalletConfirmationModalProps> = ({
   if (!isOpen) return null;
 
   return (
-    <div className="pallet-modal-overlay" onClick={handleOverlayClick}>
+    <Modal isOpen={isOpen} onClose={handleClose}>
       <div className="pallet-modal-container">
         <div className="pallet-modal-header">
           <h2>📦 Confirmación de Pallet</h2>
-          <button 
+          <Button
             className="pallet-modal-close"
             onClick={handleClose}
             disabled={loading}
+            aria-label="Cerrar"
           >
             ✕
-          </button>
+          </Button>
         </div>
 
         <div className="pallet-modal-content">
@@ -213,48 +210,48 @@ const PalletConfirmationModal: React.FC<PalletConfirmationModalProps> = ({
               </div>
 
               <div className="pallet-actions">
-                <button 
+                <Button
                   onClick={handleConfirm}
                   className="confirm-btn"
                 >
                   ✅ Sí, confirmo {palletDetails.numeroCajas} cajas
-                </button>
-                
+                </Button>
+
                 <div className="issue-buttons">
-                  <button 
+                  <Button
                     onClick={() => handleReportIssue('Número de cajas no coincide')}
                     className="issue-btn count-issue"
                   >
                     📊 El número no coincide
-                  </button>
-                  
-                  <button 
+                  </Button>
+
+                  <Button
                     onClick={() => handleReportIssue('Cajas dañadas')}
                     className="issue-btn damage-issue"
                   >
                     📦 Cajas dañadas
-                  </button>
-                  
-                  <button 
+                  </Button>
+
+                  <Button
                     onClick={() => handleReportIssue('Producto incorrecto')}
                     className="issue-btn product-issue"
                   >
                     🏷️ Producto incorrecto
-                  </button>
-                  
-                  <button 
+                  </Button>
+
+                  <Button
                     onClick={() => handleReportIssue('Otro problema operacional')}
                     className="issue-btn other-issue"
                   >
                     ❓ Otro problema
-                  </button>
+                  </Button>
                 </div>
               </div>
             </div>
           )}
         </div>
       </div>
-    </div>
+    </Modal>
   );
 };
 

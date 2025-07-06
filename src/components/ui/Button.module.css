@@ -1,0 +1,22 @@
+.button {
+  min-height: var(--touch-size);
+  min-width: var(--touch-size);
+  padding: 0 1rem;
+  border-radius: var(--corner-radius);
+  border: 1px solid var(--input-border);
+  background-color: var(--background-white);
+  color: var(--text-primary);
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: opacity 0.15s ease;
+}
+
+.button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.button:not(:disabled):active {
+  opacity: 0.7;
+}

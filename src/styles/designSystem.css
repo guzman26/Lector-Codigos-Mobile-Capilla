@@ -1,0 +1,45 @@
+@font-face {
+  font-family: 'SF Pro';
+  src: url('/fonts/SF-Pro.woff2') format('woff2');
+  font-weight: 300 900;
+  font-display: swap;
+}
+
+:root {
+  --font-base: 'SF Pro', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  --color-bg: #ffffff;
+  --color-surface: #f2f2f7;
+  --color-accent: #007aff;
+  --color-text: #1c1c1e;
+  --spacing-sm: 8px;
+  --spacing-md: 16px;
+  --spacing-lg: 24px;
+  --corner-radius: 8px;
+  --touch-size: 44px;
+  --nav-height: 44px;
+  --modal-radius: 16px;
+
+  /* aliases for existing styles */
+  --text-primary: var(--color-text);
+  --background-white: var(--color-bg);
+  --background-light-gray: var(--color-surface);
+  --btn-primary-bg: var(--color-accent);
+  --input-border: #d0d5dd;
+  --btn-secondary-bg: #f0f0f0;
+  --border-dark: #c7c7cc;
+  --industrial-primary: var(--color-accent);
+  --industrial-primary-dark: #0057d9;
+  --industrial-success: #34c759;
+  --input-bg: var(--color-bg);
+  --input-focus-border: var(--color-accent);
+  --shadow-light: rgba(0,0,0,0.05);
+  --shadow-medium: rgba(0,0,0,0.1);
+  --shadow-dark: rgba(0,0,0,0.2);
+  --shadow-focus: rgba(0,122,255,0.2);
+}
+
+body {
+  font-family: var(--font-base);
+  background-color: var(--color-bg);
+  color: var(--color-text);
+}
