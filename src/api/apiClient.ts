@@ -90,6 +90,7 @@ const delay = (ms: number): Promise<void> =>
 
 /**
  * Processes the API response and handles errors
+ * Handles Lambda response format: { success: boolean, data, error: { code, message }, meta }
  */
 const processResponse = async <T>(response: Response): Promise<ApiResponse<T>> => {
   const contentType = response.headers.get('content-type');
@@ -109,27 +110,83 @@ const processResponse = async <T>(response: Response): Promise<ApiResponse<T>> =
     );
   }
 
+  // Handle Lambda response format from response body
+  // Lambda may return 200 status with error in body, so check body first
+  if (typeof data === 'object' && data !== null) {
+    const responseData = data as any;
+    
+    // Lambda returns responses with success/error structure in body
+    // Check if response has Lambda format: { success, data, error, meta }
+    if ('success' in responseData || ('error' in responseData && typeof responseData.error === 'object') || 'meta' in responseData) {
+      // If Lambda returned an error object in the body (even with 200 status)
+      if (responseData.error && typeof responseData.error === 'object' && responseData.error.message) {
+        const errorMessage = responseData.error.message || responseData.message || 'Error desconocido';
+        const errorCode = responseData.error.code || response.status || 'UNKNOWN_ERROR';
+        
+        throw new ApiClientError(
+          errorMessage,
+          errorCode,
+          responseData
+        );
+      }
+      
+      // Failed response (success: false) - Lambda indicates failure
+      if (responseData.success === false) {
+        const errorMessage = responseData.error?.message || responseData.message || 'Operación fallida';
+        const errorCode = responseData.error?.code || response.status || 'OPERATION_FAILED';
+        
+        throw new ApiClientError(
+          errorMessage,
+          errorCode,
+          responseData
+        );
+      }
+      
+      // Success response from Lambda (success: true or success is not false)
+      // Lambda ApiPresenter always returns success: true or success: false, never undefined
+      if (responseData.success !== false) {
+        return {
+          success: true,
+          data: responseData.data,
+          message: responseData.message,
+        } as ApiResponse<T>;
+      }
+    }
+  }
+
+  // Handle HTTP status errors (non-200 responses)
+  // This handles cases where Lambda returned non-200 status codes
   if (!response.ok) {
     let errorMessage = `Error ${response.status}: ${response.statusText}`;
     
+    // Try to extract error message from response body
+    if (typeof data === 'object' && data !== null) {
+      const responseData = data as any;
+      
+      // Lambda error format: { success: false, error: { code, message }, meta }
+      if (responseData.error && typeof responseData.error === 'object' && responseData.error.message) {
+        errorMessage = responseData.error.message;
+      } else if (responseData.message) {
+        errorMessage = responseData.message;
+      }
+    }
+    
     // Handle common HTTP errors with more descriptive messages
-    switch (response.status) {
-      case 404:
-        errorMessage = 'Endpoint no encontrado - verifica la configuración de la API';
-        break;
-      case 405:
-        errorMessage = 'Método no permitido - el endpoint no soporta esta operación';
-        break;
-      case 500:
-        errorMessage = 'Error interno del servidor - contacta al administrador';
-        break;
-      case 503:
-        errorMessage = 'Servicio no disponible - intenta nuevamente más tarde';
-        break;
-      default:
-        if (typeof data === 'object' && data && 'message' in data) {
-          errorMessage = (data as ApiError).message;
-        }
+    if (errorMessage.includes('Error ')) {
+      switch (response.status) {
+        case 404:
+          errorMessage = 'Endpoint no encontrado - verifica la configuración de la API';
+          break;
+        case 405:
+          errorMessage = 'Método no permitido - el endpoint no soporta esta operación';
+          break;
+        case 500:
+          errorMessage = 'Error interno del servidor - contacta al administrador';
+          break;
+        case 503:
+          errorMessage = 'Servicio no disponible - intenta nuevamente más tarde';
+          break;
+      }
     }
     
     throw new ApiClientError(
@@ -139,13 +196,13 @@ const processResponse = async <T>(response: Response): Promise<ApiResponse<T>> =
     );
   }
 
-  // Handle responses that don't follow our standard ApiResponse format
+  // Handle successful responses that don't follow Lambda format
   // If it's a successful response but doesn't have the expected structure, normalize it
   if (typeof data === 'object' && data) {
     const responseData = data as any;
     
     // If it already has our expected structure, return as-is
-    if ('success' in responseData || 'data' in responseData || 'error' in responseData) {
+    if ('success' in responseData || 'data' in responseData) {
       return data as ApiResponse<T>;
     }
     
