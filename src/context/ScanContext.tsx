@@ -1,11 +1,18 @@
 import React, { createContext, useContext, useState, useCallback, ReactNode } from 'react';
 import { submitScan, ApiClientError } from '../api';
 import type { ProcessScanRequest, ProcessScanResult } from '../api/types';
+import { getErrorWithSuggestion } from '../utils/errorMessages';
+
+interface ErrorInfo {
+  message: string;
+  suggestion?: string;
+}
 
 interface ScanContextType {
   data: ProcessScanResult | null;
   loading: boolean;
   error: string | null;
+  errorInfo: ErrorInfo | null;
   history: ProcessScanResult[];
   processScan: (request: ProcessScanRequest) => Promise<void>;
   reset: () => void;
@@ -22,6 +29,7 @@ export const ScanProvider: React.FC<ScanProviderProps> = ({ children }) => {
   const [data, setData] = useState<ProcessScanResult | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [errorInfo, setErrorInfo] = useState<ErrorInfo | null>(null);
   const [history, setHistory] = useState<ProcessScanResult[]>([]);
 
   const processScan = useCallback(async (request: ProcessScanRequest) => {
@@ -37,6 +45,7 @@ export const ScanProvider: React.FC<ScanProviderProps> = ({ children }) => {
 
     setLoading(true);
     setError(null);
+    setErrorInfo(null);
 
     try {
       const result = await submitScan(request);
@@ -54,11 +63,11 @@ export const ScanProvider: React.FC<ScanProviderProps> = ({ children }) => {
       });
       
     } catch (error) {
-      const errorMessage = error instanceof ApiClientError 
-        ? error.message 
-        : 'Error desconocido al procesar el escaneo';
+      // Use translation system for user-friendly error messages with suggestions
+      const errorInfo = getErrorWithSuggestion(error, 'scan');
       
-      setError(errorMessage);
+      setError(errorInfo.message);
+      setErrorInfo(errorInfo);
       setData(null);
     } finally {
       setLoading(false);
@@ -69,6 +78,7 @@ export const ScanProvider: React.FC<ScanProviderProps> = ({ children }) => {
     setData(null);
     setLoading(false);
     setError(null);
+    setErrorInfo(null);
   }, []);
 
   const clearHistory = useCallback(() => {
@@ -79,6 +89,7 @@ export const ScanProvider: React.FC<ScanProviderProps> = ({ children }) => {
     data,
     loading,
     error,
+    errorInfo,
     history,
     processScan,
     reset,

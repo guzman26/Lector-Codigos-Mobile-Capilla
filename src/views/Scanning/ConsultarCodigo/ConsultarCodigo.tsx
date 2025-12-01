@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { ScannedCodeInfo } from '../../../api/types';
 import { validateScannedCode } from '../../../utils/validators';
+import { getUserFriendlyError } from '../../../utils/errorMessages';
 import './ConsultarCodigo.css';
 import { useNavigate } from 'react-router-dom';
 import { useScannedCodeContext } from '../../../context/ScannedCodeContext';
@@ -71,7 +72,8 @@ const ConsultarCodigo: React.FC = () => {
       setCodigo(''); // Clear input after successful search
     } catch (err: any) {
       console.error('Error consultando código:', err);
-      setError(err.message || 'Error al consultar el código');
+      // Use translation system for user-friendly error messages
+      setError(getUserFriendlyError(err, 'scan'));
       setResult(null);
     } finally {
       setLoading(false);

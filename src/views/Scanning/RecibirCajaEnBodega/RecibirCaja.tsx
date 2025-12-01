@@ -16,7 +16,7 @@ const RegistrarCaja: React.FC = () => {
   const [pendingPalletCode, setPendingPalletCode] = useState('');
   const [reportReason, setReportReason] = useState('');
   const inputRef = useRef<HTMLInputElement>(null);
-  const { data, loading, error, processScan, reset } = useScanContext();
+  const { data, loading, error, errorInfo, processScan, reset } = useScanContext();
 
   const handleSubmit = async (e?: React.FormEvent) => {
     e?.preventDefault();
@@ -151,7 +151,12 @@ const RegistrarCaja: React.FC = () => {
         <div className="error-section">
           <div className="error-message">
             <span className="error-icon">⚠️</span>
-            <span className="error-text">{error}</span>
+            <div className="error-content">
+              <span className="error-text">{error}</span>
+              {errorInfo?.suggestion && (
+                <p className="error-suggestion">💡 {errorInfo.suggestion}</p>
+              )}
+            </div>
             <Button onClick={reset} className="error-close">✕</Button>
           </div>
         </div>
