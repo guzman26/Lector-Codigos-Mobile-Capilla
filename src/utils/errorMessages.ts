@@ -12,6 +12,8 @@ interface ErrorTranslation {
 
 /**
  * Common error patterns that need translation
+ * Sincronizado con el catálogo de códigos del backend
+ * Nota: Las sugerencias del backend tienen prioridad sobre estas
  */
 const ERROR_TRANSLATIONS: Record<string, ErrorTranslation> = {
   // Network Errors
@@ -23,11 +25,51 @@ const ERROR_TRANSLATIONS: Record<string, ErrorTranslation> = {
     message: 'Tiempo de espera agotado',
     suggestion: 'La petición tardó demasiado. Intenta nuevamente',
   },
+  PARSE_ERROR: {
+    message: 'Error al procesar la respuesta del servidor',
+    suggestion: 'Intenta nuevamente. Si el problema persiste, contacta al administrador',
+  },
   
   // Validation Errors
   VALIDATION_ERROR: {
     message: 'Error de validación',
     suggestion: 'Verifica que los datos ingresados sean correctos',
+  },
+  INVALID_BOX_CODE: {
+    message: 'El código de caja debe tener exactamente 16 dígitos',
+    suggestion: 'Verifica que hayas escaneado el código completo',
+  },
+  INVALID_PALLET_CODE: {
+    message: 'El código de tarja debe tener exactamente 14 dígitos',
+    suggestion: 'Verifica que hayas escaneado el código completo',
+  },
+  INVALID_LOCATION: {
+    message: 'La ubicación proporcionada no es válida',
+    suggestion: 'Verifica que la ubicación sea correcta',
+  },
+  INVALID_CALIBRE: {
+    message: 'El calibre no coincide con lo solicitado',
+    suggestion: 'El calibre de la caja/pallet no está en los calibres solicitados para esta venta',
+  },
+  BOX_COUNT_EXCEEDED: {
+    message: 'Excede la cantidad de cajas solicitadas',
+    suggestion: 'Has escaneado más cajas de las solicitadas para este calibre. Remueve algunas cajas',
+  },
+  EGGS_EXCEEDED: {
+    message: 'Excede la cantidad de huevos permitida',
+    suggestion: 'La cantidad de huevos excede el límite permitido',
+  },
+  EGGS_INCOMPLETE: {
+    message: 'Faltan cajas para completar la venta',
+    suggestion: 'Aún faltan cajas por escanear. Continúa escaneando hasta completar todas las cajas solicitadas',
+  },
+  NO_REQUESTED_CALIBRES: {
+    message: 'Esta venta no tiene calibres solicitados',
+    suggestion: 'Esta venta no se puede despachar porque no tiene calibres definidos',
+  },
+  SALE_NOT_DRAFT: {
+    message: 'La venta no se puede modificar',
+    suggestion: 'Solo se pueden modificar ventas en borrador (DRAFT). Esta venta ya fue confirmada',
   },
   'Box code must be 16 digits': {
     message: 'El código de caja debe tener 16 dígitos',
@@ -46,6 +88,30 @@ const ERROR_TRANSLATIONS: Record<string, ErrorTranslation> = {
   NOT_FOUND: {
     message: 'No encontrado',
     suggestion: 'Verifica que el código sea correcto',
+  },
+  BOX_NOT_FOUND: {
+    message: 'La caja no fue encontrada en el sistema',
+    suggestion: 'El código de caja no existe en el sistema. Verifica que hayas escaneado correctamente',
+  },
+  PALLET_NOT_FOUND: {
+    message: 'La tarja no fue encontrada en el sistema',
+    suggestion: 'El código de tarja no existe en el sistema. Verifica que hayas escaneado correctamente',
+  },
+  CUSTOMER_NOT_FOUND: {
+    message: 'El cliente no fue encontrado',
+    suggestion: 'El cliente con el ID proporcionado no existe en el sistema',
+  },
+  SALE_NOT_FOUND: {
+    message: 'La venta no fue encontrada',
+    suggestion: 'La venta con el ID proporcionado no existe en el sistema',
+  },
+  BOX_NOT_IN_SALE: {
+    message: 'La caja no está en esta venta',
+    suggestion: 'Esta caja no está en la venta actual. Verifica el código',
+  },
+  PALLET_NOT_IN_SALE: {
+    message: 'El pallet no está en esta venta',
+    suggestion: 'Este pallet no está en la venta actual. Verifica el código',
   },
   'Box not found': {
     message: 'Caja no encontrada',
@@ -69,6 +135,34 @@ const ERROR_TRANSLATIONS: Record<string, ErrorTranslation> = {
     message: 'Conflicto en la operación',
     suggestion: 'El recurso ya existe o fue modificado. Intenta actualizar la página',
   },
+  BOX_ALREADY_EXISTS: {
+    message: 'La caja ya existe en el sistema',
+    suggestion: 'Esta caja ya fue registrada anteriormente',
+  },
+  BOX_ALREADY_IN_SALE: {
+    message: 'La caja ya está en esta venta',
+    suggestion: 'Esta caja ya fue agregada. Verifica que no hayas escaneado el mismo código dos veces',
+  },
+  PALLET_ALREADY_IN_SALE: {
+    message: 'El pallet ya está en esta venta',
+    suggestion: 'Este pallet ya fue agregado. Verifica que no hayas escaneado el mismo código dos veces',
+  },
+  CUSTOMER_ALREADY_EXISTS: {
+    message: 'El cliente ya existe en el sistema',
+    suggestion: 'Ya existe un cliente con el email proporcionado',
+  },
+  BOX_NOT_IN_BODEGA: {
+    message: 'La caja no está en BODEGA',
+    suggestion: 'Solo se pueden agregar cajas que estén en BODEGA. Verifica la ubicación de la caja',
+  },
+  PALLET_NOT_IN_BODEGA: {
+    message: 'El pallet no está en BODEGA',
+    suggestion: 'Solo se pueden agregar pallets que estén en BODEGA. Verifica la ubicación del pallet',
+  },
+  PALLET_NO_BOXES_IN_BODEGA: {
+    message: 'El pallet no tiene cajas en BODEGA',
+    suggestion: 'El pallet no tiene cajas disponibles en BODEGA para agregar a la venta',
+  },
   'Box with code': {
     message: 'La caja ya existe en el sistema',
     suggestion: 'Esta caja ya fue registrada anteriormente',
@@ -88,6 +182,24 @@ const ERROR_TRANSLATIONS: Record<string, ErrorTranslation> = {
   INTERNAL_ERROR: {
     message: 'Error interno del servidor',
     suggestion: 'Ocurrió un error inesperado. Si el problema persiste, contacta al administrador',
+  },
+  DATABASE_ERROR: {
+    message: 'Error de base de datos',
+    suggestion: 'Error al acceder a la base de datos. Intenta nuevamente en unos momentos',
+  },
+  SERVICE_UNAVAILABLE: {
+    message: 'Servicio no disponible',
+    suggestion: 'El servicio está temporalmente no disponible. Intenta nuevamente más tarde',
+  },
+  
+  // Rate Limit Errors
+  RATE_LIMIT_EXCEEDED: {
+    message: 'Demasiadas solicitudes',
+    suggestion: 'Has excedido el límite de solicitudes. Por favor, espera unos momentos e intenta nuevamente',
+  },
+  THROTTLING_ERROR: {
+    message: 'Servicio temporalmente sobrecargado',
+    suggestion: 'El servicio está temporalmente sobrecargado. Por favor, intente nuevamente',
   },
   
   // DynamoDB Errors
@@ -140,6 +252,56 @@ const CONTEXT_ERROR_MESSAGES: Record<string, Record<string, ErrorTranslation>> =
       suggestion: 'Revisa que todos los campos requeridos estén completos y sean válidos',
     },
   },
+  dispatch: {
+    'SALE_NOT_DRAFT': {
+      message: 'La venta no se puede modificar',
+      suggestion: 'Solo se pueden modificar ventas en borrador (DRAFT). Esta venta ya fue confirmada.',
+    },
+    'NO_REQUESTED_CALIBRES': {
+      message: 'Esta venta no tiene calibres solicitados',
+      suggestion: 'Esta venta no se puede despachar porque no tiene calibres definidos.',
+    },
+    'BOX_ALREADY_IN_SALE': {
+      message: 'La caja ya está en esta venta',
+      suggestion: 'Esta caja ya fue agregada. Verifica que no hayas escaneado el mismo código dos veces.',
+    },
+    'PALLET_ALREADY_IN_SALE': {
+      message: 'El pallet ya está en esta venta',
+      suggestion: 'Este pallet ya fue agregado. Verifica que no hayas escaneado el mismo código dos veces.',
+    },
+    'BOX_NOT_IN_BODEGA': {
+      message: 'La caja no está en BODEGA',
+      suggestion: 'Solo se pueden agregar cajas que estén en BODEGA. Verifica la ubicación de la caja.',
+    },
+    'PALLET_NOT_IN_BODEGA': {
+      message: 'El pallet no está en BODEGA',
+      suggestion: 'Solo se pueden agregar pallets que estén en BODEGA. Verifica la ubicación del pallet.',
+    },
+    'PALLET_NO_BOXES_IN_BODEGA': {
+      message: 'El pallet no tiene cajas en BODEGA',
+      suggestion: 'El pallet no tiene cajas disponibles en BODEGA para agregar a la venta.',
+    },
+    'INVALID_CALIBRE': {
+      message: 'El calibre no coincide con lo solicitado',
+      suggestion: 'El calibre de la caja/pallet no está en los calibres solicitados para esta venta.',
+    },
+    'BOX_COUNT_EXCEEDED': {
+      message: 'Excede la cantidad de cajas solicitadas',
+      suggestion: 'Has escaneado más cajas de las solicitadas para este calibre. Remueve algunas cajas.',
+    },
+    'EGGS_INCOMPLETE': {
+      message: 'Faltan cajas para completar la venta',
+      suggestion: 'Aún faltan cajas por escanear. Continúa escaneando hasta completar todas las cajas solicitadas.',
+    },
+    'BOX_NOT_IN_SALE': {
+      message: 'La caja no está en esta venta',
+      suggestion: 'Esta caja no está en la venta actual. Verifica el código.',
+    },
+    'PALLET_NOT_IN_SALE': {
+      message: 'El pallet no está en esta venta',
+      suggestion: 'Este pallet no está en la venta actual. Verifica el código.',
+    },
+  },
 };
 
 /**
@@ -154,16 +316,23 @@ export function translateError(
 ): { message: string; suggestion?: string } {
   let errorMessage = '';
   let errorCode = '';
+  let backendSuggestion: string | undefined;
   
   // Extract error message and code
   if (error instanceof Error) {
     errorMessage = error.message;
     errorCode = (error as any).code || '';
+    // Extract suggestion from error details if available (from ApiClientError)
+    if ((error as any).details) {
+      backendSuggestion = (error as any).details.suggestion;
+    }
   } else if (typeof error === 'string') {
     errorMessage = error;
   } else if (error && typeof error === 'object') {
     errorMessage = (error as any).message || (error as any).error?.message || '';
     errorCode = (error as any).code || (error as any).error?.code || '';
+    // Extract suggestion from error object (new unified format)
+    backendSuggestion = (error as any).suggestion || (error as any).error?.suggestion || (error as any).details?.suggestion;
   }
   
   // First, try context-specific translations
@@ -175,7 +344,8 @@ export function translateError(
       const translation = contextTranslations[errorCode];
       return {
         message: translation.message,
-        suggestion: translation.suggestion,
+        // Priorizar sugerencia del backend sobre la local
+        suggestion: backendSuggestion || translation.suggestion,
       };
     }
     
@@ -184,7 +354,8 @@ export function translateError(
       if (errorMessage.includes(pattern) || errorMessage === pattern) {
         return {
           message: translation.message,
-          suggestion: translation.suggestion,
+          // Priorizar sugerencia del backend sobre la local
+          suggestion: backendSuggestion || translation.suggestion,
         };
       }
     }
@@ -195,7 +366,8 @@ export function translateError(
     const translation = ERROR_TRANSLATIONS[errorCode];
     return {
       message: translation.message,
-      suggestion: translation.suggestion,
+      // Priorizar sugerencia del backend sobre la local
+      suggestion: backendSuggestion || translation.suggestion,
     };
   }
   
@@ -204,7 +376,8 @@ export function translateError(
     if (errorMessage.includes(pattern) || errorMessage === pattern) {
       return {
         message: translation.message,
-        suggestion: translation.suggestion,
+        // Priorizar sugerencia del backend sobre la local
+        suggestion: backendSuggestion || translation.suggestion,
       };
     }
   }
@@ -223,7 +396,8 @@ export function translateError(
     if (isSpanishMessage && !isTechnicalMessage) {
       return {
         message: errorMessage,
-        suggestion: 'Si el problema persiste, contacta al administrador',
+        // Priorizar sugerencia del backend
+        suggestion: backendSuggestion || 'Si el problema persiste, contacta al administrador',
       };
     }
     
@@ -241,14 +415,16 @@ export function translateError(
     
     return {
       message: friendlyMessage,
-      suggestion: 'Si el problema persiste, contacta al administrador',
+      // Priorizar sugerencia del backend
+      suggestion: backendSuggestion || 'Si el problema persiste, contacta al administrador',
     };
   }
   
   // Ultimate fallback
   return {
     message: 'Ocurrió un error inesperado',
-    suggestion: 'Por favor intenta nuevamente o contacta al administrador si el problema persiste',
+    // Priorizar sugerencia del backend
+    suggestion: backendSuggestion || 'Por favor intenta nuevamente o contacta al administrador si el problema persiste',
   };
 }
 

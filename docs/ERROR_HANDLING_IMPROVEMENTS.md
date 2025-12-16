@@ -152,3 +152,4 @@ Para agregar nuevas traducciones:
 - Las traducciones tienen prioridad: contexto > código de error > patrón de mensaje > mensaje original
 - Los mensajes del backend mejorados tienen prioridad sobre traducciones genéricas
 
+

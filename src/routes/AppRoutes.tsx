@@ -7,6 +7,8 @@ import Historial from '../views/Historial';
 import RegistrarCaja from '../views/Scanning/RecibirCajaEnBodega/RecibirCaja';
 import ConsultarCodigo from '../views/Scanning/ConsultarCodigo/ConsultarCodigo';
 import CrearPallet from '../views/Scanning/CreatePalletForm/CreatePalletForm';
+import DespacharVenta from '../views/DespacharVenta/DespacharVenta';
+import EscanearVenta from '../views/EscanearVenta/EscanearVenta';
 
 const AppRoutes: React.FC = () => {
   return (
@@ -33,6 +35,12 @@ const AppRoutes: React.FC = () => {
 
           {/* Crear pallet route */}
           <Route path="/crear-pallet" element={<CrearPallet />} />
+
+          {/* Despachar venta route */}
+          <Route path="/despachar-venta" element={<DespacharVenta />} />
+
+          {/* Escanear venta route */}
+          <Route path="/escanear-venta/:saleId" element={<EscanearVenta />} />
           
           {/* Future routes can be added here */}
           {/* <Route path="/scanner" element={<Scanner />} /> */}

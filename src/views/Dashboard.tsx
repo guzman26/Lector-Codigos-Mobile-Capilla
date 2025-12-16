@@ -136,6 +136,12 @@ const Dashboard: React.FC = () => {
           <span className="btn-text">Crear Pallet</span>
         </Button>
 
+        <Button
+          className="action-btn"
+          onClick={() => navigate('/despachar-venta')}
+        >
+          <span className="btn-text">Despachar Ventas</span>
+        </Button>
 
         <Button className="action-btn" onClick={handleReportClick}>
           <span className="btn-text">Registrar Problema</span>

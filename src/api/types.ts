@@ -370,11 +370,17 @@ export interface GetOrdersParams {
 
 /**
  * Order resource - Create action params
+ * Supports two formats:
+ * 1. Legacy: items with palletId/palletCode and boxIds (specific boxes from pallets)
+ * 2. New: items with calibre and quantity (auto-select boxes by calibre from BODEGA)
  */
 export interface CreateOrderParams {
   customerId: string;
   type: 'Venta' | 'Reposición' | 'Donación' | 'Inutilizado' | 'Ración';
-  items: Array<{ palletCode: string }>;
+  items: Array<
+    | { palletId?: string; palletCode?: string; boxIds: string[] } // Legacy format
+    | { calibre: string; quantity: number } // New format: auto-select by calibre
+  >;
   notes?: string;
   metadata?: Record<string, any>;
 }

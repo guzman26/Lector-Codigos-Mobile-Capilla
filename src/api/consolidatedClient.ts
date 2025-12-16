@@ -288,6 +288,28 @@ export const salesApi = {
     cancel: async <T = any>(params: any): Promise<ApiResponse<T>> => {
       return makeConsolidatedRequest('/sales', 'order', 'cancel', params);
     },
+
+    /**
+     * Add boxes or pallets to a DRAFT sale
+     */
+    'add-boxes': async <T = any>(params: {
+      saleId: string;
+      boxCode?: string;
+      palletCode?: string;
+    }): Promise<ApiResponse<T>> => {
+      return makeConsolidatedRequest('/sales', 'order', 'add-boxes', params);
+    },
+
+    /**
+     * Remove boxes or pallets from a DRAFT sale
+     */
+    'remove-boxes': async <T = any>(params: {
+      saleId: string;
+      boxCode?: string;
+      palletCode?: string;
+    }): Promise<ApiResponse<T>> => {
+      return makeConsolidatedRequest('/sales', 'order', 'remove-boxes', params);
+    },
   },
 
   /**

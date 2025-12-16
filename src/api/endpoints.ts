@@ -362,6 +362,134 @@ export const submitScan = async (
 };
 
 /**
+ * Get confirmed sales orders (for dispatch)
+ */
+export const getConfirmedSales = async (params?: {
+  filters?: { state?: string };
+  pagination?: { limit?: number; lastKey?: string };
+}): Promise<any> => {
+  const response = await consolidatedApi.salesApi.order.get({
+    filters: { state: 'CONFIRMED', ...params?.filters },
+    pagination: params?.pagination,
+  });
+
+  if (!response.success) {
+    throw new apiClient.ApiClientError(
+      response.error || 'No se pudieron obtener las ventas',
+      'FETCH_ERROR'
+    );
+  }
+
+  return response.data;
+};
+
+/**
+ * Get sale by ID
+ */
+export const getSaleById = async (saleId: string): Promise<any> => {
+  const response = await consolidatedApi.salesApi.order.get({
+    id: saleId,
+  });
+
+  if (!response.success) {
+    throw new apiClient.ApiClientError(
+      response.error || 'No se pudo obtener la venta',
+      'FETCH_ERROR'
+    );
+  }
+
+  return response.data?.sale;
+};
+
+/**
+ * Add box to sale
+ */
+export const addBoxToSale = async (params: {
+  saleId: string;
+  boxCode: string;
+}): Promise<any> => {
+  const response = await consolidatedApi.salesApi.order['add-boxes']({
+    saleId: params.saleId,
+    boxCode: params.boxCode,
+  });
+
+  if (!response.success) {
+    throw new apiClient.ApiClientError(
+      response.error || 'No se pudo agregar la caja a la venta',
+      'ADD_BOX_ERROR'
+    );
+  }
+
+  return response.data;
+};
+
+/**
+ * Add pallet to sale
+ */
+export const addPalletToSale = async (params: {
+  saleId: string;
+  palletCode: string;
+}): Promise<any> => {
+  const response = await consolidatedApi.salesApi.order['add-boxes']({
+    saleId: params.saleId,
+    palletCode: params.palletCode,
+  });
+
+  if (!response.success) {
+    throw new apiClient.ApiClientError(
+      response.error || 'No se pudo agregar el pallet a la venta',
+      'ADD_PALLET_ERROR'
+    );
+  }
+
+  return response.data;
+};
+
+/**
+ * Remove box from sale
+ */
+export const removeBoxFromSale = async (params: {
+  saleId: string;
+  boxCode: string;
+}): Promise<any> => {
+  const response = await consolidatedApi.salesApi.order['remove-boxes']({
+    saleId: params.saleId,
+    boxCode: params.boxCode,
+  });
+
+  if (!response.success) {
+    throw new apiClient.ApiClientError(
+      response.error || 'No se pudo remover la caja de la venta',
+      'REMOVE_BOX_ERROR'
+    );
+  }
+
+  return response.data;
+};
+
+/**
+ * Remove pallet from sale
+ */
+export const removePalletFromSale = async (params: {
+  saleId: string;
+  palletCode: string;
+}): Promise<any> => {
+  const response = await consolidatedApi.salesApi.order['remove-boxes']({
+    saleId: params.saleId,
+    palletCode: params.palletCode,
+  });
+
+  if (!response.success) {
+    throw new apiClient.ApiClientError(
+      response.error || 'No se pudo remover el pallet de la venta',
+      'REMOVE_PALLET_ERROR'
+    );
+  }
+
+  return response.data;
+};
+
+/**
  * API endpoints object for easy access
  */
 export const endpoints = {
@@ -374,4 +502,10 @@ export const endpoints = {
   submitScan,
   createPallet,
   getPalletDetails,
+  getConfirmedSales,
+  getSaleById,
+  addBoxToSale,
+  addPalletToSale,
+  removeBoxFromSale,
+  removePalletFromSale,
 } as const;

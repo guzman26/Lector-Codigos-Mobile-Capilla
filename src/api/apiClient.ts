@@ -91,7 +91,8 @@ const delay = (ms: number): Promise<void> =>
 
 /**
  * Processes the API response and handles errors
- * Handles Lambda response format: { success: boolean, data, error: { code, message }, meta }
+ * Handles unified format: { status: 'success'|'fail'|'error', message, error?: { code, message, field?, details?, suggestion? }, data?, meta }
+ * Also supports legacy format: { success: boolean, data, error: { code, message }, meta }
  */
 const processResponse = async <T>(response: Response): Promise<ApiResponse<T>> => {
   const contentType = response.headers.get('content-type');
@@ -111,13 +112,46 @@ const processResponse = async <T>(response: Response): Promise<ApiResponse<T>> =
     );
   }
 
-  // Handle Lambda response format from response body
-  // Lambda may return 200 status with error in body, so check body first
+  // Handle unified format and legacy format from response body
   if (typeof data === 'object' && data !== null) {
     const responseData = data as any;
     
-    // Lambda returns responses with success/error structure in body
-    // Check if response has Lambda format: { success, data, error, meta }
+    // Nuevo formato unificado: { status: 'success'|'fail'|'error', message, error?: {...}, data?, meta }
+    if ('status' in responseData && typeof responseData.status === 'string') {
+      const status = responseData.status;
+      
+      // Error response (status: 'fail' or 'error')
+      if (status === 'fail' || status === 'error') {
+        const errorInfo = responseData.error || {};
+        const errorMessage = errorInfo.message || responseData.message || 'Error desconocido';
+        const errorCode = errorInfo.code || response.status || 'UNKNOWN_ERROR';
+        
+        // Include additional error information
+        const errorDetails: any = {
+          ...responseData,
+          field: errorInfo.field,
+          suggestion: errorInfo.suggestion,
+          details: errorInfo.details,
+        };
+        
+        throw new ApiClientError(
+          errorMessage,
+          errorCode,
+          errorDetails
+        );
+      }
+      
+      // Success response (status: 'success')
+      if (status === 'success') {
+        return {
+          success: true,
+          data: responseData.data,
+          message: responseData.message,
+        } as ApiResponse<T>;
+      }
+    }
+    
+    // Legacy format: { success: boolean, data, error: { code, message }, meta }
     if ('success' in responseData || ('error' in responseData && typeof responseData.error === 'object') || 'meta' in responseData) {
       // If Lambda returned an error object in the body (even with 200 status)
       if (responseData.error && typeof responseData.error === 'object' && responseData.error.message) {
@@ -144,7 +178,6 @@ const processResponse = async <T>(response: Response): Promise<ApiResponse<T>> =
       }
       
       // Success response from Lambda (success: true or success is not false)
-      // Lambda ApiPresenter always returns success: true or success: false, never undefined
       if (responseData.success !== false) {
         return {
           success: true,
@@ -159,14 +192,28 @@ const processResponse = async <T>(response: Response): Promise<ApiResponse<T>> =
   // This handles cases where Lambda returned non-200 status codes
   if (!response.ok) {
     let errorMessage = `Error ${response.status}: ${response.statusText}`;
+    let errorCode: string | number = response.status;
+    let errorDetails: any = null;
     
     // Try to extract error message from response body
     if (typeof data === 'object' && data !== null) {
       const responseData = data as any;
       
-      // Lambda error format: { success: false, error: { code, message }, meta }
-      if (responseData.error && typeof responseData.error === 'object' && responseData.error.message) {
+      // Nuevo formato unificado
+      if (responseData.error && typeof responseData.error === 'object') {
+        errorMessage = responseData.error.message || responseData.message || errorMessage;
+        errorCode = responseData.error.code || errorCode;
+        errorDetails = {
+          ...responseData,
+          field: responseData.error.field,
+          suggestion: responseData.error.suggestion,
+          details: responseData.error.details,
+        };
+      }
+      // Legacy format
+      else if (responseData.error && typeof responseData.error === 'object' && responseData.error.message) {
         errorMessage = responseData.error.message;
+        errorCode = responseData.error.code || errorCode;
       } else if (responseData.message) {
         errorMessage = responseData.message;
       }
@@ -192,8 +239,8 @@ const processResponse = async <T>(response: Response): Promise<ApiResponse<T>> =
     
     throw new ApiClientError(
       errorMessage,
-      response.status,
-      data
+      errorCode,
+      errorDetails || data
     );
   }
 
