@@ -82,6 +82,7 @@
   
   .layout-content {
     padding: 1.5rem 1rem 5rem 1rem;
+    padding-top: 2rem;
   }
 }
 
@@ -95,7 +96,7 @@
   }
   
   .layout-content {
-    padding: 1rem 0.75rem 4.5rem 0.75rem;
+    padding: 1.25rem 0.75rem 4.5rem 0.75rem;
   }
 }
 

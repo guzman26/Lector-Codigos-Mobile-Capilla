@@ -59,14 +59,13 @@ const RegistrarCaja: React.FC = () => {
 
   const handlePalletConfirm = async () => {
     // Procesar el pallet normalmente
+    // El modal se cerrará automáticamente cuando la operación sea exitosa (ver useEffect)
     await processScan({
       codigo: pendingPalletCode,
       ubicacion: 'BODEGA'
     });
-    
-    // Limpiar estados
-    setPendingPalletCode('');
-    setShowPalletModal(false);
+    // No cerrar el modal aquí - esperar a que termine la operación
+    // Si hay error, se mostrará y el modal permanecerá abierto
   };
 
   const handlePalletReportIssue = (reason?: string) => {
@@ -100,6 +99,12 @@ const RegistrarCaja: React.FC = () => {
   // Limpiar código después de un escaneo exitoso
   useEffect(() => {
     if (data && data.success) {
+      // Si el modal de pallet está abierto y la operación fue exitosa, cerrarlo
+      if (showPalletModal) {
+        setShowPalletModal(false);
+        setPendingPalletCode('');
+      }
+      
       const timer = setTimeout(() => {
         setCodigo('');
         // Mantener foco si está en modo scanner
@@ -109,7 +114,7 @@ const RegistrarCaja: React.FC = () => {
       }, 1000); // Reducido a 1 segundo para mejor flujo
       return () => clearTimeout(timer);
     }
-  }, [data, scanBoxMode]);
+  }, [data, scanBoxMode, showPalletModal]);
 
   const validation = validateScannedCode(codigo);
   const showValidationError = codigo.length > 0 && !validation.isValid;
@@ -291,6 +296,8 @@ const RegistrarCaja: React.FC = () => {
         onConfirm={handlePalletConfirm}
         onReportIssue={handlePalletReportIssue}
         onClose={handlePalletModalClose}
+        processing={loading}
+        processingError={error}
       />
 
       {/* Modal de reportar problemas */}

@@ -191,18 +191,23 @@ export const get = async <T>(
       throw error;
     }
     
+    // Check if user is offline
+    const isOffline = typeof navigator !== 'undefined' && !navigator.onLine;
+    
     // Enhanced error handling for common network issues
     let errorMessage = 'Error de conexión con el servidor';
     
-    if (error instanceof Error) {
+    if (isOffline) {
+      errorMessage = 'Sin conexión a internet. Verifica tu conexión e intenta nuevamente.';
+    } else if (error instanceof Error) {
       if (error.name === 'AbortError') {
         errorMessage = 'Tiempo de espera agotado - la petición tardó demasiado';
-      } else if (error.message.includes('CORS')) {
+      } else if (error.message.includes('CORS') || error.message.includes('cors')) {
         errorMessage = 'Error de CORS - verifica la configuración del servidor';
+      } else if (error.message.includes('Failed to fetch') || error.message.includes('NetworkError') || error.message.includes('Network request failed')) {
+        errorMessage = 'No se pudo conectar al servidor. Verifica tu conexión a internet e intenta nuevamente.';
       } else if (error.message.includes('fetch')) {
         errorMessage = 'Error de red - verifica tu conexión a internet';
-      } else if (error.message.includes('Failed to fetch')) {
-        errorMessage = 'No se pudo conectar al servidor - verifica la URL de la API';
       }
     }
     
@@ -239,18 +244,23 @@ export const post = async <T>(
       throw error;
     }
     
+    // Check if user is offline
+    const isOffline = typeof navigator !== 'undefined' && !navigator.onLine;
+    
     // Enhanced error handling for common network issues
     let errorMessage = 'Error de conexión con el servidor';
     
-    if (error instanceof Error) {
+    if (isOffline) {
+      errorMessage = 'Sin conexión a internet. Verifica tu conexión e intenta nuevamente.';
+    } else if (error instanceof Error) {
       if (error.name === 'AbortError') {
         errorMessage = 'Tiempo de espera agotado - la petición tardó demasiado';
-      } else if (error.message.includes('CORS')) {
+      } else if (error.message.includes('CORS') || error.message.includes('cors')) {
         errorMessage = 'Error de CORS - verifica la configuración del servidor';
+      } else if (error.message.includes('Failed to fetch') || error.message.includes('NetworkError') || error.message.includes('Network request failed')) {
+        errorMessage = 'No se pudo conectar al servidor. Verifica tu conexión a internet e intenta nuevamente.';
       } else if (error.message.includes('fetch')) {
         errorMessage = 'Error de red - verifica tu conexión a internet';
-      } else if (error.message.includes('Failed to fetch')) {
-        errorMessage = 'No se pudo conectar al servidor - verifica la URL de la API';
       }
     }
     

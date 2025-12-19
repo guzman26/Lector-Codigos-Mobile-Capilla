@@ -27,6 +27,8 @@ interface PalletConfirmationModalProps {
   onConfirm: () => void;
   onReportIssue: (reason?: string) => void;
   onClose: () => void;
+  processing?: boolean;
+  processingError?: string | null;
 }
 
 const PalletConfirmationModal: React.FC<PalletConfirmationModalProps> = ({
@@ -34,7 +36,9 @@ const PalletConfirmationModal: React.FC<PalletConfirmationModalProps> = ({
   palletCode,
   onConfirm,
   onReportIssue,
-  onClose
+  onClose,
+  processing = false,
+  processingError = null
 }) => {
   const [palletDetails, setPalletDetails] = useState<PalletDetails | null>(null);
   const [loading, setLoading] = useState(false);
@@ -68,8 +72,9 @@ const PalletConfirmationModal: React.FC<PalletConfirmationModalProps> = ({
   };
 
   const handleConfirm = () => {
+    // No cerrar el modal aquí - se cerrará automáticamente cuando la operación sea exitosa
+    // Si hay error, se mostrará en el modal
     onConfirm();
-    handleClose();
   };
 
   const handleReportIssue = (reason: string) => {
@@ -129,13 +134,34 @@ const PalletConfirmationModal: React.FC<PalletConfirmationModalProps> = ({
             </div>
           )}
 
-          {error && (
+          {error && !processingError && (
             <div className="pallet-error">
               <span className="error-icon">⚠️</span>
               <p>{error}</p>
               <button onClick={fetchPalletDetails} className="retry-btn">
                 Reintentar
               </button>
+            </div>
+          )}
+
+          {processingError && (
+            <div className="pallet-error">
+              <span className="error-icon">⚠️</span>
+              <p><strong>Error de conexión con el servidor</strong></p>
+              <p>{processingError}</p>
+              <p className="error-suggestion">
+                💡 Verifica tu conexión a internet e intenta nuevamente
+              </p>
+              <button onClick={fetchPalletDetails} className="retry-btn">
+                Reintentar
+              </button>
+            </div>
+          )}
+
+          {processing && (
+            <div className="pallet-processing">
+              <div className="loading-spinner"></div>
+              <p>Procesando recepción del pallet...</p>
             </div>
           )}
 
@@ -216,14 +242,16 @@ const PalletConfirmationModal: React.FC<PalletConfirmationModalProps> = ({
                 <button 
                   onClick={handleConfirm}
                   className="confirm-btn"
+                  disabled={processing || loading}
                 >
-                  ✅ Sí, confirmo {palletDetails.numeroCajas} cajas
+                  {processing ? '⏳ Procesando...' : `✅ Sí, confirmo ${palletDetails.numeroCajas} cajas`}
                 </button>
                 
                 <div className="issue-buttons">
                   <button 
                     onClick={() => handleReportIssue('Número de cajas no coincide')}
                     className="issue-btn count-issue"
+                    disabled={processing || loading}
                   >
                     📊 El número no coincide
                   </button>
@@ -231,6 +259,7 @@ const PalletConfirmationModal: React.FC<PalletConfirmationModalProps> = ({
                   <button 
                     onClick={() => handleReportIssue('Cajas dañadas')}
                     className="issue-btn damage-issue"
+                    disabled={processing || loading}
                   >
                     📦 Cajas dañadas
                   </button>
@@ -238,6 +267,7 @@ const PalletConfirmationModal: React.FC<PalletConfirmationModalProps> = ({
                   <button 
                     onClick={() => handleReportIssue('Producto incorrecto')}
                     className="issue-btn product-issue"
+                    disabled={processing || loading}
                   >
                     🏷️ Producto incorrecto
                   </button>
@@ -245,6 +275,7 @@ const PalletConfirmationModal: React.FC<PalletConfirmationModalProps> = ({
                   <button 
                     onClick={() => handleReportIssue('Otro problema operacional')}
                     className="issue-btn other-issue"
+                    disabled={processing || loading}
                   >
                     ❓ Otro problema
                   </button>
