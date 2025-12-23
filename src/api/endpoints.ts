@@ -9,7 +9,12 @@ import type {
   RegisterBoxResult,
   ProcessScanRequest,
   ProcessScanResult,
-  ApiResponse 
+  ApiResponse,
+  GetDraftSalesRequest,
+  GetDraftSalesResponse,
+  AddBoxesToSaleRequest,
+  AddBoxesToSaleResponse,
+  SalesOrder
 } from './types';
 
 /**
@@ -561,6 +566,171 @@ export const getPalletDetails = async (
 };
 
 /**
+ * Gets list of sales orders in DRAFT state
+ */
+export const getDraftSales = async (
+  request?: GetDraftSalesRequest
+): Promise<ApiResponse<GetDraftSalesResponse>> => {
+  try {
+    console.log('📡 Making API request to get draft sales');
+    
+    const response = await apiClient.post<GetDraftSalesResponse>(
+      '/sales',
+      {
+        resource: 'order',
+        action: 'get',
+        filters: {
+          state: 'DRAFT',
+          ...request?.filters,
+        },
+        pagination: request?.pagination,
+      }
+    );
+
+    console.log('✅ Draft sales response received:', response);
+    
+    // Handle response format - backend may return { sales: [...] } or just the array
+    if (response.success && response.data) {
+      // If data is already in the expected format, return as-is
+      if ('sales' in response.data) {
+        return response;
+      }
+      // If data is an array, wrap it
+      if (Array.isArray(response.data)) {
+        return {
+          ...response,
+          data: {
+            sales: response.data as SalesOrder[],
+          },
+        };
+      }
+      // If data has a 'sales' property at root level
+      if (typeof response.data === 'object' && 'sales' in (response.data as any)) {
+        return response;
+      }
+    }
+    
+    return response;
+  } catch (error) {
+    console.error('❌ API Request failed:', error);
+    
+    if (error instanceof apiClient.ApiClientError) {
+      throw error;
+    }
+    
+    throw new apiClient.ApiClientError(
+      'Error al obtener las ventas en borrador',
+      'REQUEST_FAILED',
+      error
+    );
+  }
+};
+
+/**
+ * Adds a box or pallet to an existing DRAFT sale
+ * Validates the code before making the request
+ */
+export const addBoxesToSale = async (
+  request: AddBoxesToSaleRequest
+): Promise<ApiResponse<AddBoxesToSaleResponse>> => {
+  // Validate that either boxCode or palletCode is provided, but not both
+  if (!request.boxCode && !request.palletCode) {
+    throw new apiClient.ApiClientError(
+      'Debe proporcionar boxCode o palletCode',
+      'VALIDATION_ERROR'
+    );
+  }
+
+  if (request.boxCode && request.palletCode) {
+    throw new apiClient.ApiClientError(
+      'Solo se puede agregar una caja o un pallet a la vez',
+      'VALIDATION_ERROR'
+    );
+  }
+
+  // Validate code format if provided
+  if (request.boxCode) {
+    const validation = validateScannedCode(request.boxCode);
+    if (!validation.isValid || validation.type !== 'box') {
+      throw new apiClient.ApiClientError(
+        'El código debe ser de una caja válida (15 dígitos)',
+        'VALIDATION_ERROR'
+      );
+    }
+  }
+
+  if (request.palletCode) {
+    const validation = validateScannedCode(request.palletCode);
+    if (!validation.isValid || validation.type !== 'pallet') {
+      throw new apiClient.ApiClientError(
+        'El código debe ser de un pallet válido (12 dígitos)',
+        'VALIDATION_ERROR'
+      );
+    }
+  }
+
+  if (!request.saleId) {
+    throw new apiClient.ApiClientError(
+      'saleId es requerido',
+      'VALIDATION_ERROR'
+    );
+  }
+
+  try {
+    console.log('📡 Making API request to add boxes to sale:', {
+      saleId: request.saleId,
+      boxCode: request.boxCode,
+      palletCode: request.palletCode,
+    });
+    
+    const response = await apiClient.post<AddBoxesToSaleResponse>(
+      '/sales',
+      {
+        resource: 'order',
+        action: 'add-boxes',
+        saleId: request.saleId,
+        boxCode: request.boxCode?.trim(),
+        palletCode: request.palletCode?.trim(),
+      }
+    );
+
+    console.log('✅ Add boxes to sale response received:', response);
+    return response;
+  } catch (error) {
+    console.error('❌ API Request failed:', error);
+    
+    if (error instanceof apiClient.ApiClientError) {
+      throw error;
+    }
+    
+    throw new apiClient.ApiClientError(
+      'Error al agregar items a la venta',
+      'REQUEST_FAILED',
+      error
+    );
+  }
+};
+
+/**
+ * Alternative method that returns only the data or throws an error
+ * Useful for simpler error handling in components
+ */
+export const submitAddBoxesToSale = async (
+  request: AddBoxesToSaleRequest
+): Promise<AddBoxesToSaleResponse> => {
+  const response = await addBoxesToSale(request);
+  
+  if (!response.success || !response.data) {
+    throw new apiClient.ApiClientError(
+      response.error || 'No se pudieron agregar los items a la venta',
+      'NO_DATA'
+    );
+  }
+  
+  return response.data;
+};
+
+/**
  * API endpoints object for easy access
  */
 export const endpoints = {
@@ -573,4 +743,7 @@ export const endpoints = {
   submitScan,
   createPallet,
   getPalletDetails,
+  getDraftSales,
+  addBoxesToSale,
+  submitAddBoxesToSale,
 } as const; 

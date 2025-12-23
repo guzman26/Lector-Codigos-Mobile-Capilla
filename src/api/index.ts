@@ -31,6 +31,11 @@ export type {
   RegisterBoxResult,
   ProcessScanRequest,
   ProcessScanResult,
+  SalesOrder,
+  GetDraftSalesRequest,
+  GetDraftSalesResponse,
+  AddBoxesToSaleRequest,
+  AddBoxesToSaleResponse,
 } from './types';
 
 // Endpoints
@@ -40,7 +45,10 @@ export {
   registerBox,
   submitBoxRegistration,
   processScan,
-  submitScan
+  submitScan,
+  getDraftSales,
+  addBoxesToSale,
+  submitAddBoxesToSale,
 } from './endpoints';
 
 // Utilities (re-export for convenience)

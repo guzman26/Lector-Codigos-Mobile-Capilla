@@ -7,6 +7,8 @@ import Historial from '../views/Historial';
 import RegistrarCaja from '../views/Scanning/RecibirCajaEnBodega/RecibirCaja';
 import ConsultarCodigo from '../views/Scanning/ConsultarCodigo/ConsultarCodigo';
 import CrearPallet from '../views/Scanning/CreatePalletForm/CreatePalletForm';
+import SelectSale from '../views/Sales/SelectSale';
+import ScanForSale from '../views/Sales/ScanForSale';
 
 const AppRoutes: React.FC = () => {
   return (
@@ -33,6 +35,10 @@ const AppRoutes: React.FC = () => {
 
           {/* Crear pallet route */}
           <Route path="/crear-pallet" element={<CrearPallet />} />
+
+          {/* Sales routes */}
+          <Route path="/sales/select" element={<SelectSale />} />
+          <Route path="/sales/scan/:saleId" element={<ScanForSale />} />
           
           {/* Future routes can be added here */}
           {/* <Route path="/scanner" element={<Scanner />} /> */}

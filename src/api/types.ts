@@ -135,4 +135,95 @@ export interface ProcessScanResult {
     timestamp: string;
     [key: string]: any;
   };
+}
+
+/**
+ * Sales Order structure
+ */
+export interface SalesOrder {
+  id: string;
+  saleId: string;
+  customerId: string;
+  customerInfo: {
+    name: string;
+    email?: string;
+    phone?: string;
+  };
+  state: 'DRAFT' | 'CONFIRMED' | 'DISPATCHED' | 'COMPLETED' | 'CANCELLED' | 'PARTIALLY_RETURNED' | 'FULLY_RETURNED';
+  type?: string;
+  items?: Array<{
+    palletId?: string;
+    palletCode?: string;
+    boxIds: string[];
+  }>;
+  boxes?: string[];
+  pallets?: string[];
+  totalBoxes?: number;
+  totalBoxCount?: number;
+  totalEggs?: number;
+  notes?: string;
+  createdAt: string;
+  updatedAt: string;
+  createdBy?: string;
+  metadata?: {
+    requestedBoxesByCalibre?: Array<{
+      calibre: string;
+      boxCount: number;
+    }>;
+    boxesByCalibre?: Record<string, number>;
+    palletSummary?: Record<string, any>;
+    [key: string]: any;
+  };
+}
+
+/**
+ * Get Draft Sales Request
+ */
+export interface GetDraftSalesRequest {
+  filters?: {
+    customerId?: string;
+    startDate?: string;
+    endDate?: string;
+  };
+  pagination?: {
+    limit?: number;
+    lastEvaluatedKey?: string;
+  };
+}
+
+/**
+ * Get Draft Sales Response
+ */
+export interface GetDraftSalesResponse {
+  sales: SalesOrder[];
+  pagination?: {
+    lastEvaluatedKey?: string;
+    hasMore?: boolean;
+  };
+}
+
+/**
+ * Add Boxes to Sale Request
+ */
+export interface AddBoxesToSaleRequest {
+  saleId: string;
+  boxCode?: string;
+  palletCode?: string;
+}
+
+/**
+ * Add Boxes to Sale Response
+ */
+export interface AddBoxesToSaleResponse {
+  sale: SalesOrder;
+  currentEggs: number;
+  isComplete: boolean;
+  boxesByCalibre: Record<string, number>;
+  remainingBoxes: Record<string, number>;
+  addedItem: {
+    type: 'box' | 'pallet';
+    code: string;
+    calibre: string;
+    eggs: number;
+  };
 } 
