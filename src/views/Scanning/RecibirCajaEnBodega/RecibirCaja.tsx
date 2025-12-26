@@ -8,13 +8,15 @@ const RegistrarCaja: React.FC = () => {
   const navigate = useNavigate();
   const [codigo, setCodigo] = useState('');
   const [scanBoxMode, setScanBoxMode] = useState(false);
+  const [isProcessing, setIsProcessing] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const { data, loading, error, processScan, reset } = useScanContext();
 
   const handleSubmit = async (e?: React.FormEvent) => {
     e?.preventDefault();
     
-    if (!codigo.trim()) {
+    // Prevenir llamadas duplicadas
+    if (isProcessing || loading || !codigo.trim()) {
       return;
     }
 
@@ -23,15 +25,21 @@ const RegistrarCaja: React.FC = () => {
       return;
     }
 
-    // Procesar directamente tanto cajas como pallets
-    await processScan({
-      codigo: codigo.trim(),
-      ubicacion: 'BODEGA'
-    });
+    setIsProcessing(true);
+    try {
+      // Procesar directamente tanto cajas como pallets
+      await processScan({
+        codigo: codigo.trim(),
+        ubicacion: 'BODEGA'
+      });
+    } finally {
+      setIsProcessing(false);
+    }
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter') {
+      e.preventDefault(); // Prevenir el submit del formulario
       handleSubmit();
     }
   };
