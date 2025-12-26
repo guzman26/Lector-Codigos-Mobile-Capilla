@@ -345,31 +345,71 @@ export const processScan = async (scanData: ProcessScanRequest): Promise<ApiResp
       scanData
     );
   } else if (type === 'pallet') {
-    // Usar el endpoint consolidado /inventory para mover pallets
-    const response = await apiClient.post<any>(
-      '/inventory',
-      {
-        resource: 'pallet',
-        action: 'move',
-        codigo: scanData.codigo.trim(),
-        ubicacion: scanData.ubicacion.trim()
+    // Intentar primero con action: 'update' (formato sugerido por el usuario)
+    // Si falla, el backend debería devolver un error apropiado
+    let response;
+    try {
+      response = await apiClient.post<any>(
+        '/inventory',
+        {
+          resource: 'pallet',
+          action: 'update',
+          codigo: scanData.codigo.trim(),
+          ubicacion: scanData.ubicacion.trim()
+        }
+      );
+    } catch (error: any) {
+      // Si update falla porque ubicacion no se puede actualizar, intentar con move
+      if (error.message?.includes('ubicacion') || error.message?.includes('protected fields')) {
+        console.log('Update failed, trying move action instead');
+        response = await apiClient.post<any>(
+          '/inventory',
+          {
+            resource: 'pallet',
+            action: 'move',
+            codigo: scanData.codigo.trim(),
+            ubicacion: scanData.ubicacion.trim()
+          }
+        );
+      } else {
+        throw error;
       }
-    );
+    }
     
-    // Adaptar la respuesta al formato esperado
-    if (response.success && response.data) {
-      return {
-        success: true,
-        data: {
-          codigo: response.data.pallet?.codigo || scanData.codigo.trim(),
-          tipo: 'PALLET',
-          ubicacion: response.data.newLocation || scanData.ubicacion.trim(),
-          estado: response.data.pallet?.estado || 'registrado',
-          timestamp: new Date().toISOString(),
-          boxesMoved: response.data.boxesMoved || 0
-        },
-        message: response.data.message || 'Pallet recepcionado exitosamente'
-      };
+    // Adaptar la respuesta al formato esperado (soporta ApiEnvelope y ApiResponse)
+    if (response) {
+      // Formato ApiEnvelope: { status: 'success', data: {...} }
+      if (response.status === 'success' && response.data) {
+        const pallet = response.data as any;
+        return {
+          success: true,
+          data: {
+            codigo: pallet.codigo || scanData.codigo.trim(),
+            tipo: 'PALLET',
+            ubicacion: pallet.ubicacion || scanData.ubicacion.trim(),
+            estado: pallet.estado || 'registrado',
+            timestamp: new Date().toISOString()
+          },
+          message: response.message || 'Pallet recepcionado exitosamente'
+        };
+      }
+      
+      // Formato ApiResponse: { success: true, data: {...} }
+      if (response.success && response.data) {
+        const data = response.data;
+        return {
+          success: true,
+          data: {
+            codigo: data.pallet?.codigo || data.codigo || scanData.codigo.trim(),
+            tipo: 'PALLET',
+            ubicacion: data.newLocation || data.ubicacion || scanData.ubicacion.trim(),
+            estado: data.pallet?.estado || data.estado || 'registrado',
+            timestamp: new Date().toISOString(),
+            boxesMoved: data.boxesMoved || 0
+          },
+          message: data.message || response.message || 'Pallet recepcionado exitosamente'
+        };
+      }
     }
     
     return response;
