@@ -122,19 +122,25 @@ export interface ProcessScanRequest {
 }
 
 /**
- * Process Scan Response
+ * Process Scan Response (full API response)
  */
-export interface ProcessScanResult {
+export interface ProcessScanResponse {
   success: boolean;
   message: string;
-  data?: {
-    codigo: string;
-    tipo: 'BOX' | 'PALLET';
-    ubicacion: string;
-    estado: string;
-    timestamp: string;
-    [key: string]: any;
-  };
+  data?: ProcessScanResult;
+}
+
+/**
+ * Process Scan Result (returned by submitScan)
+ */
+export interface ProcessScanResult {
+  codigo: string;
+  tipo: 'BOX' | 'PALLET';
+  ubicacion: string;
+  estado: string;
+  timestamp: string;
+  boxesMoved?: number;
+  [key: string]: any;
 }
 
 /**

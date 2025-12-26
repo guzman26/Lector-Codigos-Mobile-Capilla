@@ -9,6 +9,7 @@ import type {
   RegisterBoxResult,
   ProcessScanRequest,
   ProcessScanResult,
+  ProcessScanResponse,
   ApiResponse,
   GetDraftSalesRequest,
   GetDraftSalesResponse,
@@ -335,7 +336,7 @@ export const submitBoxRegistration = async (boxData: RegisterBoxRequest): Promis
   return response.data;
 };
 
-export const processScan = async (scanData: ProcessScanRequest): Promise<ApiResponse<ProcessScanResult>> => {
+export const processScan = async (scanData: ProcessScanRequest): Promise<ProcessScanResponse> => {
   console.log('🔍 Analyzing scan response in processScan:', scanData);
 
   const type = scanData.codigo.length === 15 ? 'box' : 'pallet';
