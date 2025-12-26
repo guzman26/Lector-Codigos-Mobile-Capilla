@@ -25,13 +25,24 @@ const RegistrarCaja: React.FC = () => {
       return;
     }
 
+    const codigoToProcess = codigo.trim();
     setIsProcessing(true);
     try {
       // Procesar directamente tanto cajas como pallets
       await processScan({
-        codigo: codigo.trim(),
+        codigo: codigoToProcess,
         ubicacion: 'BODEGA'
       });
+      
+      // Limpiar el input inmediatamente después de un escaneo exitoso
+      setCodigo('');
+      
+      // Mantener foco si está en modo scanner
+      if (scanBoxMode && inputRef.current) {
+        setTimeout(() => {
+          inputRef.current?.focus();
+        }, 100);
+      }
     } finally {
       setIsProcessing(false);
     }
@@ -60,19 +71,8 @@ const RegistrarCaja: React.FC = () => {
     }
   }, [scanBoxMode, codigo]);
 
-  // Limpiar código después de un escaneo exitoso
-  useEffect(() => {
-    if (data && data.success) {
-      const timer = setTimeout(() => {
-        setCodigo('');
-        // Mantener foco si está en modo scanner
-        if (scanBoxMode && inputRef.current) {
-          inputRef.current.focus();
-        }
-      }, 1000); // Reducido a 1 segundo para mejor flujo
-      return () => clearTimeout(timer);
-    }
-  }, [data, scanBoxMode]);
+  // El input ya se limpia en handleSubmit después de un escaneo exitoso
+  // Este useEffect solo mantiene el foco en modo scanner cuando cambia el código
 
   const validation = validateScannedCode(codigo);
   const showValidationError = codigo.length > 0 && !validation.isValid;
@@ -119,20 +119,21 @@ const RegistrarCaja: React.FC = () => {
         </div>
       )}
 
-      {/* Resultado exitoso */}
+      {/* Notificación de éxito en la parte inferior */}
       {data && data.success && (
-        <div className="success-section">
-          <div className="success-message">
-            <span className="success-icon">✅</span>
-            <div className="success-content">
-              <h3>¡Caja procesada exitosamente!</h3>
-              <div className="success-details">
-                <p><strong>Código:</strong> {data.data?.codigo}</p>
-                <p><strong>Ubicación:</strong> {data.data?.ubicacion}</p>
-                <p><strong>Estado:</strong> {data.data?.estado}</p>
-              </div>
-              <p className="success-note">Puede escanear otra caja</p>
+        <div className="success-notification">
+          <div className="success-notification-content">
+            <span className="success-notification-icon">✅</span>
+            <div className="success-notification-text">
+              <strong>¡Éxito!</strong> {data.data?.tipo === 'PALLET' ? 'Pallet' : 'Caja'} {data.data?.codigo} recepcionado en {data.data?.ubicacion}
             </div>
+            <button 
+              className="success-notification-close"
+              onClick={() => reset()}
+              aria-label="Cerrar notificación"
+            >
+              ✕
+            </button>
           </div>
         </div>
       )}
