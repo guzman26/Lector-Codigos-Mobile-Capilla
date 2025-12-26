@@ -87,6 +87,15 @@ const RegistrarCaja: React.FC = () => {
   const showValidationError = codigo.length > 0 && !validation.isValid;
   const showTypeError = codigo.length > 0 && validation.isValid && validation.type !== 'box' && validation.type !== 'pallet';
 
+  // Debug: Log para verificar los datos recibidos
+  useEffect(() => {
+    if (data) {
+      console.log('📦 Datos recibidos en RecibirCaja:', data);
+      console.log('✅ Success:', data.success || (data as any).status === 'success');
+      console.log('📋 Data object:', data.data);
+    }
+  }, [data]);
+
   return (
     <div className="registrar-caja-content">
       <div className="registrar-caja-header">
@@ -129,12 +138,13 @@ const RegistrarCaja: React.FC = () => {
       )}
 
       {/* Notificación de éxito en la parte inferior */}
-      {data && data.success && (
+      {data && data.success && data.data && (
         <div className="success-notification">
           <div className="success-notification-content">
             <span className="success-notification-icon">✅</span>
             <div className="success-notification-text">
-              <strong>¡Éxito!</strong> {data.data?.tipo === 'PALLET' ? 'Pallet' : 'Caja'} {data.data?.codigo} recepcionado en {data.data?.ubicacion}
+              <strong>¡Éxito!</strong> {data.data.tipo === 'PALLET' ? 'Pallet' : 'Caja'} {data.data.codigo} recepcionado en {data.data.ubicacion}
+              {data.data.boxesMoved > 0 && ` (${data.data.boxesMoved} cajas)`}
             </div>
             <button 
               className="success-notification-close"

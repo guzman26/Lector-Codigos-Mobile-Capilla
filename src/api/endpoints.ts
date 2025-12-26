@@ -357,42 +357,47 @@ export const processScan = async (scanData: ProcessScanRequest): Promise<ApiResp
       }
     );
     
-    // Adaptar la respuesta al formato esperado (soporta ApiEnvelope y ApiResponse)
-    if (response) {
-      // Formato ApiEnvelope: { status: 'success', data: {...} }
-      if (response.status === 'success' && response.data) {
-        const pallet = response.data as any;
+    // Adaptar la respuesta al formato esperado
+    // Formato esperado: { status: 'success', data: { pallet: {...}, boxesMoved: number, newLocation: string } }
+    if (response && response.status === 'success' && response.data) {
+      const responseData = response.data as any;
+      const pallet = responseData.pallet;
+      
+      if (pallet) {
         return {
           success: true,
           data: {
             codigo: pallet.codigo || scanData.codigo.trim(),
             tipo: 'PALLET',
-            ubicacion: pallet.ubicacion || scanData.ubicacion.trim(),
+            ubicacion: responseData.newLocation || pallet.ubicacion || scanData.ubicacion.trim(),
             estado: pallet.estado || 'registrado',
-            timestamp: new Date().toISOString()
-          },
-          message: response.message || 'Pallet recepcionado exitosamente'
-        };
-      }
-      
-      // Formato ApiResponse: { success: true, data: {...} }
-      if (response.success && response.data) {
-        const data = response.data;
-        return {
-          success: true,
-          data: {
-            codigo: data.pallet?.codigo || data.codigo || scanData.codigo.trim(),
-            tipo: 'PALLET',
-            ubicacion: data.newLocation || data.ubicacion || scanData.ubicacion.trim(),
-            estado: data.pallet?.estado || data.estado || 'registrado',
             timestamp: new Date().toISOString(),
-            boxesMoved: data.boxesMoved || 0
+            boxesMoved: responseData.boxesMoved || 0
           },
-          message: data.message || response.message || 'Pallet recepcionado exitosamente'
+          message: responseData.message || response.message || 'Pallet recepcionado exitosamente'
         };
       }
     }
     
+    // Formato alternativo: { success: true, data: {...} }
+    if (response && response.success && response.data) {
+      const data = response.data as any;
+      return {
+        success: true,
+        data: {
+          codigo: data.pallet?.codigo || data.codigo || scanData.codigo.trim(),
+          tipo: 'PALLET',
+          ubicacion: data.newLocation || data.ubicacion || scanData.ubicacion.trim(),
+          estado: data.pallet?.estado || data.estado || 'registrado',
+          timestamp: new Date().toISOString(),
+          boxesMoved: data.boxesMoved || 0
+        },
+        message: data.message || response.message || 'Pallet recepcionado exitosamente'
+      };
+    }
+    
+    // Si no se pudo adaptar, devolver la respuesta original
+    console.warn('⚠️ Respuesta no reconocida:', response);
     return response;
   } else {
     throw new apiClient.ApiClientError(
