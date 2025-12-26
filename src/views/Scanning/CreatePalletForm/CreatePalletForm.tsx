@@ -83,10 +83,10 @@ export const CreatePalletForm: React.FC<CreatePalletFormProps> = ({
                 name="codigoManual"
                 value={formData.codigoManual}
                 onChange={handleInputChange}
-                placeholder="Ingrese el código de 12 dígitos"
+                placeholder="Ingrese el código de 14 dígitos"
                 className={`form-input ${errors.codigoManual ? 'error' : ''}`}
-                maxLength={12}
-                pattern="[0-9]{12}"
+                maxLength={14}
+                pattern="[0-9]{14}"
                 required
               />
               {errors.codigoManual && (

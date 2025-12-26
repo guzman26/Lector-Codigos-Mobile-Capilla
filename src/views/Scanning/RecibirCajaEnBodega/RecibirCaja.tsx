@@ -202,7 +202,7 @@ const RegistrarCaja: React.FC = () => {
                   }, 100);
                 }
               }}
-              placeholder={scanBoxMode ? "Escanea códigos consecutivamente..." : "Escanea código de caja (15 dig.) o pallet (12 dig.)"}
+              placeholder={scanBoxMode ? "Escanea códigos consecutivamente..." : "Escanea código de caja (15 dig.) o pallet (14 dig.)"}
               className={`form-input code-input ${showValidationError || showTypeError ? 'error' : ''} ${scanBoxMode ? 'scanner-mode' : ''}`}
               disabled={loading}
               autoFocus
@@ -217,7 +217,7 @@ const RegistrarCaja: React.FC = () => {
 
             {showTypeError && (
               <span className="validation-error">
-                Tipo de código no reconocido. Use códigos de caja (15 dígitos) o pallet (12 dígitos).
+                Tipo de código no reconocido. Use códigos de caja (15 dígitos) o pallet (14 dígitos).
               </span>
             )}
 
@@ -239,7 +239,7 @@ const RegistrarCaja: React.FC = () => {
             <ul>
               <li>• Ubicación: <strong>BODEGA</strong> (automática)</li>
               <li>• Códigos de caja (15 dígitos): procesamiento directo</li>
-              <li>• Códigos de pallet (12 dígitos): requieren confirmación</li>
+              <li>• Códigos de pallet (14 dígitos): requieren confirmación</li>
               <li>• Presiona <kbd>Enter</kbd> para procesar</li>
               {scanBoxMode ? (
                 <li>• <strong>Modo Scanner:</strong> Campo siempre enfocado para escaneo consecutivo</li>
@@ -271,11 +271,11 @@ const RegistrarCaja: React.FC = () => {
               </button>
               <button
                 type="button"
-                onClick={() => setCodigo('123456789012')}
+                onClick={() => setCodigo('12345678901234')}
                 className="test-btn"
                 disabled={loading}
               >
-                Pallet: 123456789012
+                Pallet: 12345678901234
               </button>
             </div>
           </div>

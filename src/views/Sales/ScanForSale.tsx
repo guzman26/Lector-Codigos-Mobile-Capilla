@@ -157,7 +157,7 @@ const ScanForSale: React.FC = () => {
             type="text"
             value={codigo}
             onChange={(e) => setCodigo(e.target.value)}
-            placeholder="Escanea o ingresa el código (12 o 15 dígitos)"
+            placeholder="Escanea o ingresa el código (14 o 15 dígitos)"
             className="code-input"
             disabled={loading}
             autoFocus

@@ -51,8 +51,8 @@ const generatePalletCode = (params: PalletCodeParams): string => {
   // 3) año, últimos dos dígitos
   const año   = now.format("YY"); 
   
-  // Generate a 12-digit pallet code: YYMMDDTCFXXX
-  // YY = Year, MM = Month, DD = Day, T = Turno, C = Calibre, F = Formato, XXX = Random
+  // Generate an 11-digit base pallet code (backend will add 3-digit suffix to make it 14 digits total)
+  // Format: DSWWYYTCFXXX where D=Day of week, S=Week, WW=Week of year, YY=Year, T=Turno, C=Calibre, F=Formato, XXX=Random
   const randomPart = Math.floor(Math.random() * 1000).toString().padStart(3, '0');
   
   return `${diaSemana}${semana}${año}${params.turno}${params.calibre.slice(-1)}${params.formato}${randomPart}`;

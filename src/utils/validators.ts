@@ -14,7 +14,7 @@ export const isValidBoxCode = (code: string): boolean => {
 };
 
 /**
- * Validates if a code is a valid pallet code (12 digits)
+ * Validates if a code is a valid pallet code (14 digits)
  */
 export const isValidPalletCode = (code: string): boolean => {
   if (!code || typeof code !== 'string') return false;
@@ -22,8 +22,8 @@ export const isValidPalletCode = (code: string): boolean => {
   // Remove any whitespace
   const cleanCode = code.trim();
   
-  // Check if it's exactly 12 digits
-  return /^\d{12}$/.test(cleanCode);
+  // Check if it's exactly 14 digits
+  return /^\d{14}$/.test(cleanCode);
 };
 
 /**
@@ -54,7 +54,7 @@ export const validateScannedCode = (code: string): CodeValidationResult => {
     };
   }
 
-  // Check for pallet code (12 digits)
+  // Check for pallet code (14 digits)
   if (isValidPalletCode(cleanCode)) {
     return {
       isValid: true,
@@ -65,7 +65,7 @@ export const validateScannedCode = (code: string): CodeValidationResult => {
   // Invalid code
   return {
     isValid: false,
-    errorMessage: 'El código debe ser válido: código de caja (15 dígitos) o código de pallet (12 dígitos)'
+    errorMessage: 'El código debe ser válido: código de caja (15 dígitos) o código de pallet (14 dígitos)'
   };
 };
 
@@ -84,9 +84,9 @@ export const sanitizeCode = (code: string): string => {
 export const formatCodeForDisplay = (code: string): string => {
   const clean = sanitizeCode(code);
   
-  if (clean.length === 12) {
-    // Format pallet code: XXXX-XXXX-XXXX
-    return clean.replace(/(\d{4})(\d{4})(\d{4})/, '$1-$2-$3');
+  if (clean.length === 14) {
+    // Format pallet code: XXXX-XXXX-XXXX-XX
+    return clean.replace(/(\d{4})(\d{4})(\d{4})(\d{2})/, '$1-$2-$3-$4');
   }
   
   if (clean.length === 15) {

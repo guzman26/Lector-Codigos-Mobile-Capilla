@@ -388,7 +388,7 @@ export const createPallet = async (codigo: string): Promise<ApiResponse<any>> =>
   
   if (!validation.isValid || validation.type !== 'pallet') {
     throw new apiClient.ApiClientError(
-      'El código debe ser un código de pallet válido (12 dígitos)',
+      'El código debe ser un código de pallet válido (14 dígitos)',
       'VALIDATION_ERROR'
     );
   }
@@ -457,7 +457,7 @@ export const getPalletDetails = async (
 
   if (validation.type !== 'pallet') {
     throw new apiClient.ApiClientError(
-      'El código debe ser de un pallet (12 dígitos)',
+      'El código debe ser de un pallet (14 dígitos)',
       'VALIDATION_ERROR'
     );
   }
@@ -663,7 +663,7 @@ export const addBoxesToSale = async (
     const validation = validateScannedCode(request.palletCode);
     if (!validation.isValid || validation.type !== 'pallet') {
       throw new apiClient.ApiClientError(
-        'El código debe ser de un pallet válido (12 dígitos)',
+        'El código debe ser de un pallet válido (14 dígitos)',
         'VALIDATION_ERROR'
       );
     }

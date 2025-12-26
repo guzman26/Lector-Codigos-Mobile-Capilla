@@ -8,7 +8,7 @@
 export const ERROR_MESSAGES = {
   REQUIRED_FIELD: 'Este campo es obligatorio',
   INVALID_OPTION: 'Seleccione una opción válida',
-  INVALID_CODE: 'El código debe tener 12 dígitos',
+  INVALID_CODE: 'El código debe tener 14 dígitos',
   FORM_INCOMPLETE: 'Por favor complete todos los campos requeridos',
   GENERIC_ERROR: 'Ha ocurrido un error al procesar la solicitud',
   UNEXPECTED_ERROR: 'Error inesperado. Por favor intente nuevamente',
