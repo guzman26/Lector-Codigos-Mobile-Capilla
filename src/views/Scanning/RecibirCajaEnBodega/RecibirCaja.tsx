@@ -37,12 +37,10 @@ const RegistrarCaja: React.FC = () => {
       // Limpiar el input inmediatamente después de un escaneo exitoso
       setCodigo('');
       
-      // Mantener foco si está en modo scanner
-      if (scanBoxMode && inputRef.current) {
-        setTimeout(() => {
-          inputRef.current?.focus();
-        }, 100);
-      }
+      // Re-enfocar automáticamente después de limpiar
+      setTimeout(() => {
+        inputRef.current?.focus();
+      }, 100);
     } finally {
       setIsProcessing(false);
     }
@@ -64,12 +62,23 @@ const RegistrarCaja: React.FC = () => {
   };
 
 
-  // Mantener foco en input cuando está en modo scanner
+  // Mantener foco automático en el input siempre
   useEffect(() => {
-    if (scanBoxMode && inputRef.current) {
+    // Enfocar al cargar el componente
+    if (inputRef.current) {
       inputRef.current.focus();
     }
-  }, [scanBoxMode, codigo]);
+  }, []);
+
+  // Re-enfocar después de limpiar el código o cambiar el modo scanner
+  useEffect(() => {
+    if (inputRef.current && !loading) {
+      const timer = setTimeout(() => {
+        inputRef.current?.focus();
+      }, 50);
+      return () => clearTimeout(timer);
+    }
+  }, [codigo, scanBoxMode, loading]);
 
   // El input ya se limpia en handleSubmit después de un escaneo exitoso
   // Este useEffect solo mantiene el foco en modo scanner cuando cambia el código
@@ -152,14 +161,12 @@ const RegistrarCaja: React.FC = () => {
               onChange={(e) => setCodigo(e.target.value)}
               onKeyPress={handleKeyPress}
               onBlur={() => {
-                // Si está en modo scanner, volver a enfocar después de un breve delay
-                if (scanBoxMode) {
-                  setTimeout(() => {
-                    if (inputRef.current) {
-                      inputRef.current.focus();
-                    }
-                  }, 100);
-                }
+                // Volver a enfocar automáticamente después de perder el foco
+                setTimeout(() => {
+                  if (inputRef.current && !loading) {
+                    inputRef.current.focus();
+                  }
+                }, 100);
               }}
               placeholder={scanBoxMode ? "Escanea códigos consecutivamente..." : "Escanea código de caja (15 dig.) o pallet (14 dig.)"}
               className={`form-input code-input ${showValidationError || showTypeError ? 'error' : ''} ${scanBoxMode ? 'scanner-mode' : ''}`}
