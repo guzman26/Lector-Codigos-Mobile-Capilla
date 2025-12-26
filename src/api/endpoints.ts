@@ -345,13 +345,34 @@ export const processScan = async (scanData: ProcessScanRequest): Promise<ApiResp
       scanData
     );
   } else if (type === 'pallet') {
-    return await apiClient.post<ProcessScanResult>(
-      '/movePallet',
+    // Usar el endpoint consolidado /inventory para mover pallets
+    const response = await apiClient.post<any>(
+      '/inventory',
       {
+        resource: 'pallet',
+        action: 'move',
         codigo: scanData.codigo.trim(),
         ubicacion: scanData.ubicacion.trim()
-      } 
+      }
     );
+    
+    // Adaptar la respuesta al formato esperado
+    if (response.success && response.data) {
+      return {
+        success: true,
+        data: {
+          codigo: response.data.pallet?.codigo || scanData.codigo.trim(),
+          tipo: 'PALLET',
+          ubicacion: response.data.newLocation || scanData.ubicacion.trim(),
+          estado: response.data.pallet?.estado || 'registrado',
+          timestamp: new Date().toISOString(),
+          boxesMoved: response.data.boxesMoved || 0
+        },
+        message: response.data.message || 'Pallet recepcionado exitosamente'
+      };
+    }
+    
+    return response;
   } else {
     throw new apiClient.ApiClientError(
       'Tipo de escaneo no válido',
