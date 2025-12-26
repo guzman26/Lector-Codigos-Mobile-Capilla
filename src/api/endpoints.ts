@@ -345,36 +345,17 @@ export const processScan = async (scanData: ProcessScanRequest): Promise<ApiResp
       scanData
     );
   } else if (type === 'pallet') {
-    // Intentar primero con action: 'update' (formato sugerido por el usuario)
-    // Si falla, el backend debería devolver un error apropiado
-    let response;
-    try {
-      response = await apiClient.post<any>(
-        '/inventory',
-        {
-          resource: 'pallet',
-          action: 'update',
-          codigo: scanData.codigo.trim(),
-          ubicacion: scanData.ubicacion.trim()
-        }
-      );
-    } catch (error: any) {
-      // Si update falla porque ubicacion no se puede actualizar, intentar con move
-      if (error.message?.includes('ubicacion') || error.message?.includes('protected fields')) {
-        console.log('Update failed, trying move action instead');
-        response = await apiClient.post<any>(
-          '/inventory',
-          {
-            resource: 'pallet',
-            action: 'move',
-            codigo: scanData.codigo.trim(),
-            ubicacion: scanData.ubicacion.trim()
-          }
-        );
-      } else {
-        throw error;
+    // Usar action: 'move' que es el caso de uso correcto para mover un pallet
+    // UpdatePallet no permite actualizar ubicacion (está en campos prohibidos)
+    const response = await apiClient.post<any>(
+      '/inventory',
+      {
+        resource: 'pallet',
+        action: 'move',
+        codigo: scanData.codigo.trim(),
+        ubicacion: scanData.ubicacion.trim()
       }
-    }
+    );
     
     // Adaptar la respuesta al formato esperado (soporta ApiEnvelope y ApiResponse)
     if (response) {
