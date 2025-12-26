@@ -2,18 +2,12 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useScanContext } from '../../../context/ScanContext';
 import { validateScannedCode } from '../../../utils/validators';
-import { PalletConfirmationModal } from '../../../components/PalletConfirmationModal';
-import ReportIssueModal from '../../../components/ReportIssueModal';
 import './RecibirCaja.css';
 
 const RegistrarCaja: React.FC = () => {
   const navigate = useNavigate();
   const [codigo, setCodigo] = useState('');
   const [scanBoxMode, setScanBoxMode] = useState(false);
-  const [showPalletModal, setShowPalletModal] = useState(false);
-  const [showReportModal, setShowReportModal] = useState(false);
-  const [pendingPalletCode, setPendingPalletCode] = useState('');
-  const [reportReason, setReportReason] = useState('');
   const inputRef = useRef<HTMLInputElement>(null);
   const { data, loading, error, processScan, reset } = useScanContext();
 
@@ -29,14 +23,7 @@ const RegistrarCaja: React.FC = () => {
       return;
     }
 
-    // Si es un pallet, mostrar modal de confirmación
-    if (validation.type === 'pallet') {
-      setPendingPalletCode(codigo.trim());
-      setShowPalletModal(true);
-      return;
-    }
-
-    // Si es una caja, procesar directamente
+    // Procesar directamente tanto cajas como pallets
     await processScan({
       codigo: codigo.trim(),
       ubicacion: 'BODEGA'
@@ -57,37 +44,6 @@ const RegistrarCaja: React.FC = () => {
     setScanBoxMode(prev => !prev);
   };
 
-  const handlePalletConfirm = async () => {
-    // Procesar el pallet normalmente
-    // El modal se cerrará automáticamente cuando la operación sea exitosa (ver useEffect)
-    await processScan({
-      codigo: pendingPalletCode,
-      ubicacion: 'BODEGA'
-    });
-    // No cerrar el modal aquí - esperar a que termine la operación
-    // Si hay error, se mostrará y el modal permanecerá abierto
-  };
-
-  const handlePalletReportIssue = (reason?: string) => {
-    setReportReason(reason || 'Problema operacional con pallet');
-    setShowPalletModal(false);
-    setShowReportModal(true);
-  };
-
-  const handleReportModalClose = () => {
-    setShowReportModal(false);
-    setReportReason('');
-    setPendingPalletCode('');
-    // Limpiar el código escaneado para permitir nuevo escaneo
-    setCodigo('');
-  };
-
-  const handlePalletModalClose = () => {
-    setShowPalletModal(false);
-    setPendingPalletCode('');
-    // Limpiar el código escaneado para permitir nuevo escaneo
-    setCodigo('');
-  };
 
   // Mantener foco en input cuando está en modo scanner
   useEffect(() => {
@@ -99,12 +55,6 @@ const RegistrarCaja: React.FC = () => {
   // Limpiar código después de un escaneo exitoso
   useEffect(() => {
     if (data && data.success) {
-      // Si el modal de pallet está abierto y la operación fue exitosa, cerrarlo
-      if (showPalletModal) {
-        setShowPalletModal(false);
-        setPendingPalletCode('');
-      }
-      
       const timer = setTimeout(() => {
         setCodigo('');
         // Mantener foco si está en modo scanner
@@ -114,7 +64,7 @@ const RegistrarCaja: React.FC = () => {
       }, 1000); // Reducido a 1 segundo para mejor flujo
       return () => clearTimeout(timer);
     }
-  }, [data, scanBoxMode, showPalletModal]);
+  }, [data, scanBoxMode]);
 
   const validation = validateScannedCode(codigo);
   const showValidationError = codigo.length > 0 && !validation.isValid;
@@ -229,7 +179,7 @@ const RegistrarCaja: React.FC = () => {
 
             {codigo.length > 0 && validation.isValid && validation.type === 'pallet' && (
               <span className="validation-success">
-                ✓ Código de pallet válido - Presiona Enter para confirmar recepción
+                ✓ Código de pallet válido - Presiona Enter para procesar
               </span>
             )}
           </div>
@@ -239,7 +189,7 @@ const RegistrarCaja: React.FC = () => {
             <ul>
               <li>• Ubicación: <strong>BODEGA</strong> (automática)</li>
               <li>• Códigos de caja (15 dígitos): procesamiento directo</li>
-              <li>• Códigos de pallet (14 dígitos): requieren confirmación</li>
+              <li>• Códigos de pallet (14 dígitos): procesamiento directo</li>
               <li>• Presiona <kbd>Enter</kbd> para procesar</li>
               {scanBoxMode ? (
                 <li>• <strong>Modo Scanner:</strong> Campo siempre enfocado para escaneo consecutivo</li>
@@ -289,22 +239,6 @@ const RegistrarCaja: React.FC = () => {
         </div>
       )}
 
-      {/* Modal de confirmación de pallet */}
-      <PalletConfirmationModal
-        isOpen={showPalletModal}
-        palletCode={pendingPalletCode}
-        onConfirm={handlePalletConfirm}
-        onReportIssue={handlePalletReportIssue}
-        onClose={handlePalletModalClose}
-        processing={loading}
-        processingError={error}
-      />
-
-      {/* Modal de reportar problemas */}
-      <ReportIssueModal
-        isOpen={showReportModal}
-        onClose={handleReportModalClose}
-      />
     </div>
   );
 };
