@@ -1,24 +1,35 @@
 import React, { useState } from 'react';
 import { useScannedCodeContext } from '../context/ScannedCodeContext';
 import { formatCodeForDisplay } from '../api';
-import './Historial.css';
+import { getTimeAgo } from '../utils/dateFormatters';
+import {
+  Box,
+  Stack,
+  Typography,
+  TextField,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
+  Button,
+  Card,
+  CardContent,
+  Chip,
+} from '../components/ui';
 
 const Historial: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [filterType, setFilterType] = useState<'all' | 'caja' | 'pallet'>('all');
   const [filterStatus, setFilterStatus] = useState<'all' | 'activo' | 'inactivo' | 'bloqueado'>('all');
-  
+
   const { data: currentScan, history, loading, clearHistory, getCodeInfo } = useScannedCodeContext();
 
-  // Filtrar historial
   const filteredHistory = history.filter(item => {
     const matchesSearch = item.codigo.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         item.producto?.nombre?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         item.ubicacion?.almacen?.toLowerCase().includes(searchTerm.toLowerCase());
-    
+      item.producto?.nombre?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      item.ubicacion?.almacen?.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesType = filterType === 'all' || item.tipo === filterType;
     const matchesStatus = filterStatus === 'all' || item.estado === filterStatus;
-    
     return matchesSearch && matchesType && matchesStatus;
   });
 
@@ -26,207 +37,124 @@ const Historial: React.FC = () => {
     await getCodeInfo(codigo);
   };
 
-  const getTimeAgo = (dateString: string) => {
-    const date = new Date(dateString);
-    const now = new Date();
-    const diffInMinutes = Math.floor((now.getTime() - date.getTime()) / (1000 * 60));
-    
-    if (diffInMinutes < 1) return 'Hace un momento';
-    if (diffInMinutes < 60) return `Hace ${diffInMinutes} min`;
-    if (diffInMinutes < 1440) return `Hace ${Math.floor(diffInMinutes / 60)} h`;
-    return `Hace ${Math.floor(diffInMinutes / 1440)} días`;
-  };
 
   return (
-    <div className="historial-content">
-      {/* Header */}
-      <div className="historial-header">
-        <h1 className="historial-title">Historial de Escaneos</h1>
-        <p className="historial-subtitle">
-          {history.length} código{history.length !== 1 ? 's' : ''} escaneado{history.length !== 1 ? 's' : ''}
-        </p>
-      </div>
+    <Box>
+      <Typography variant="h5" gutterBottom>Historial de Escaneos</Typography>
+      <Typography variant="body2" color="text.secondary" gutterBottom>
+        {history.length} código{history.length !== 1 ? 's' : ''} escaneado{history.length !== 1 ? 's' : ''}
+      </Typography>
 
-      {/* Current Scan Banner */}
       {currentScan && (
-        <div className="current-scan-banner">
-          <div className="current-scan-icon">📱</div>
-          <div className="current-scan-info">
-            <span className="current-scan-label">Último escaneo:</span>
-            <span className="current-scan-code">{formatCodeForDisplay(currentScan.codigo)}</span>
-            <span className={`current-scan-type ${currentScan.tipo}`}>
-              {currentScan.tipo === 'caja' ? 'Caja' : 'Pallet'}
-            </span>
-          </div>
-        </div>
+        <Card variant="outlined" sx={{ mb: 2 }}>
+          <CardContent>
+            <Stack direction="row" alignItems="center" spacing={1}>
+              <Typography variant="body2" color="text.secondary">Último escaneo:</Typography>
+              <Typography variant="subtitle1">{formatCodeForDisplay(currentScan.codigo)}</Typography>
+              <Chip size="small" label={currentScan.tipo === 'caja' ? 'Caja' : 'Pallet'} variant="outlined" />
+            </Stack>
+          </CardContent>
+        </Card>
       )}
 
-      {/* Filters */}
-      <div className="filters-section">
-        <div className="search-group">
-          <input
-            type="text"
-            placeholder="Buscar por código, producto o almacén..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="search-input"
-          />
-        </div>
-        
-        <div className="filter-group">
-          <select
-            value={filterType}
-            onChange={(e) => setFilterType(e.target.value as any)}
-            className="filter-select"
-          >
-            <option value="all">Todos los tipos</option>
-            <option value="caja">Solo Cajas</option>
-            <option value="pallet">Solo Pallets</option>
-          </select>
-          
-          <select
-            value={filterStatus}
-            onChange={(e) => setFilterStatus(e.target.value as any)}
-            className="filter-select"
-          >
-            <option value="all">Todos los estados</option>
-            <option value="activo">Activos</option>
-            <option value="inactivo">Inactivos</option>
-            <option value="bloqueado">Bloqueados</option>
-          </select>
-        </div>
-
-        {history.length > 0 && (
-          <button 
-            onClick={clearHistory}
-            className="clear-history-btn"
-          >
-            Limpiar Historial
-          </button>
-        )}
-      </div>
-
-      {/* Results Count */}
-      {searchTerm || filterType !== 'all' || filterStatus !== 'all' ? (
-        <div className="results-info">
-          {filteredHistory.length} de {history.length} resultados
-          {filteredHistory.length !== history.length && (
-            <button 
-              onClick={() => {
-                setSearchTerm('');
-                setFilterType('all');
-                setFilterStatus('all');
-              }}
-              className="clear-filters-btn"
-            >
-              Limpiar filtros
-            </button>
+      <Stack spacing={2} sx={{ mb: 2 }}>
+        <TextField
+          placeholder="Buscar por código, producto o almacén..."
+          value={searchTerm}
+          onChange={e => setSearchTerm(e.target.value)}
+          size="small"
+          fullWidth
+        />
+        <Stack direction="row" spacing={1} flexWrap="wrap">
+          <FormControl size="small" sx={{ minWidth: { xs: '100%', sm: 140 }, width: { xs: '100%', sm: 'auto' } }}>
+            <InputLabel>Tipo</InputLabel>
+            <Select value={filterType} label="Tipo" onChange={e => setFilterType(e.target.value as 'all' | 'caja' | 'pallet')}>
+              <MenuItem value="all">Todos los tipos</MenuItem>
+              <MenuItem value="caja">Solo Cajas</MenuItem>
+              <MenuItem value="pallet">Solo Pallets</MenuItem>
+            </Select>
+          </FormControl>
+          <FormControl size="small" sx={{ minWidth: { xs: '100%', sm: 140 }, width: { xs: '100%', sm: 'auto' } }}>
+            <InputLabel>Estado</InputLabel>
+            <Select value={filterStatus} label="Estado" onChange={e => setFilterStatus(e.target.value as 'all' | 'activo' | 'inactivo' | 'bloqueado')}>
+              <MenuItem value="all">Todos los estados</MenuItem>
+              <MenuItem value="activo">Activos</MenuItem>
+              <MenuItem value="inactivo">Inactivos</MenuItem>
+              <MenuItem value="bloqueado">Bloqueados</MenuItem>
+            </Select>
+          </FormControl>
+          {history.length > 0 && (
+            <Button variant="outlined" size="small" onClick={clearHistory}>
+              Limpiar Historial
+            </Button>
           )}
-        </div>
-      ) : null}
+        </Stack>
+        {searchTerm || filterType !== 'all' || filterStatus !== 'all' ? (
+          <Typography variant="body2" color="text.secondary">
+            {filteredHistory.length} de {history.length} resultados
+            {filteredHistory.length !== history.length && (
+              <Button size="small" sx={{ ml: 1 }} onClick={() => { setSearchTerm(''); setFilterType('all'); setFilterStatus('all'); }}>
+                Limpiar filtros
+              </Button>
+            )}
+          </Typography>
+        ) : null}
+      </Stack>
 
-      {/* History List */}
       {filteredHistory.length === 0 ? (
-        <div className="empty-state">
+        <Box textAlign="center" py={4}>
           {history.length === 0 ? (
             <>
-              <div className="empty-icon">📋</div>
-              <h3>No hay códigos escaneados</h3>
-              <p>Los códigos que escanees aparecerán aquí automáticamente</p>
+              <Typography variant="h6" gutterBottom>📋 No hay códigos escaneados</Typography>
+              <Typography variant="body2" color="text.secondary">Los códigos que escanees aparecerán aquí automáticamente</Typography>
             </>
           ) : (
             <>
-              <div className="empty-icon">🔍</div>
-              <h3>No se encontraron resultados</h3>
-              <p>Prueba con otros filtros o términos de búsqueda</p>
+              <Typography variant="h6" gutterBottom>🔍 No se encontraron resultados</Typography>
+              <Typography variant="body2" color="text.secondary">Prueba con otros filtros o términos de búsqueda</Typography>
             </>
           )}
-        </div>
+        </Box>
       ) : (
-        <div className="history-grid">
+        <Stack spacing={2}>
           {filteredHistory.map((item, index) => (
-            <div key={`${item.codigo}-${index}`} className="history-card">
-              <div className="card-header">
-                <div className="card-code">
-                  <span className="code-text">{formatCodeForDisplay(item.codigo)}</span>
-                  <span className={`code-type-badge ${item.tipo}`}>
-                    {item.tipo === 'caja' ? 'Caja' : 'Pallet'}
-                  </span>
-                </div>
-                <span className={`status-indicator ${item.estado}`}>
-                  {item.estado.charAt(0).toUpperCase() + item.estado.slice(1)}
-                </span>
-              </div>
-
-              <div className="card-body">
-                {item.producto && (
-                  <div className="card-field">
-                    <span className="field-label">Producto:</span>
-                    <span className="field-value">{item.producto.nombre}</span>
-                  </div>
-                )}
-
-                {item.ubicacion && (
-                  <div className="card-field">
-                    <span className="field-label">Ubicación:</span>
-                    <span className="field-value">
-                      {item.ubicacion.almacen} - {item.ubicacion.zona}
-                      {item.ubicacion.posicion && ` (${item.ubicacion.posicion})`}
-                    </span>
-                  </div>
-                )}
-
-                <div className="card-field">
-                  <span className="field-label">Escaneado:</span>
-                  <span className="field-value time-value">
-                    {getTimeAgo(item.ultimaActualizacion)}
-                  </span>
-                </div>
-              </div>
-
-              <div className="card-footer">
-                <button
-                  onClick={() => handleRescan(item.codigo)}
-                  disabled={loading}
-                  className="rescan-btn"
-                >
-                  {loading ? '⏳' : '🔄'} Re-escanear
-                </button>
-                
-                <span className="scan-date">
-                  {new Date(item.fechaCreacion).toLocaleDateString('es-ES', {
-                    day: '2-digit',
-                    month: '2-digit',
-                    year: '2-digit',
-                    hour: '2-digit',
-                    minute: '2-digit'
-                  })}
-                </span>
-              </div>
-            </div>
+            <Card key={`${item.codigo}-${index}`} variant="outlined">
+              <CardContent>
+                <Stack direction="row" justifyContent="space-between" alignItems="flex-start" flexWrap="wrap" gap={1}>
+                  <Stack direction="row" alignItems="center" spacing={1}>
+                    <Typography variant="subtitle1">{formatCodeForDisplay(item.codigo)}</Typography>
+                    <Chip size="small" label={item.tipo === 'caja' ? 'Caja' : 'Pallet'} variant="outlined" />
+                  </Stack>
+                  <Chip size="small" label={item.estado.charAt(0).toUpperCase() + item.estado.slice(1)} variant="outlined" />
+                </Stack>
+                <Stack spacing={0.5} sx={{ mt: 1 }}>
+                  {item.producto && <Typography variant="body2"><strong>Producto:</strong> {item.producto.nombre}</Typography>}
+                  {item.ubicacion && <Typography variant="body2"><strong>Ubicación:</strong> {item.ubicacion.almacen} - {item.ubicacion.zona}{item.ubicacion.posicion ? ` (${item.ubicacion.posicion})` : ''}</Typography>}
+                  <Typography variant="body2" color="text.secondary">Escaneado: {getTimeAgo(item.ultimaActualizacion)}</Typography>
+                </Stack>
+                <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mt: 1 }} flexWrap="wrap" gap={1}>
+                  <Button variant="outlined" size="small" onClick={() => handleRescan(item.codigo)} disabled={loading}>
+                    {loading ? '⏳' : '🔄'} Re-escanear
+                  </Button>
+                  <Typography variant="caption" color="text.secondary">
+                    {new Date(item.fechaCreacion).toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit', year: '2-digit', hour: '2-digit', minute: '2-digit' })}
+                  </Typography>
+                </Stack>
+              </CardContent>
+            </Card>
           ))}
-        </div>
+        </Stack>
       )}
 
-      {/* Stats Footer */}
       {history.length > 0 && (
-        <div className="stats-footer">
-          <div className="stat-item">
-            <span className="stat-number">{history.filter(h => h.tipo === 'caja').length}</span>
-            <span className="stat-label">Cajas</span>
-          </div>
-          <div className="stat-item">
-            <span className="stat-number">{history.filter(h => h.tipo === 'pallet').length}</span>
-            <span className="stat-label">Pallets</span>
-          </div>
-          <div className="stat-item">
-            <span className="stat-number">{history.filter(h => h.estado === 'activo').length}</span>
-            <span className="stat-label">Activos</span>
-          </div>
-        </div>
+        <Stack direction="row" spacing={2} sx={{ mt: 2 }} flexWrap="wrap">
+          <Typography variant="body2"><strong>{history.filter(h => h.tipo === 'caja').length}</strong> Cajas</Typography>
+          <Typography variant="body2"><strong>{history.filter(h => h.tipo === 'pallet').length}</strong> Pallets</Typography>
+          <Typography variant="body2"><strong>{history.filter(h => h.estado === 'activo').length}</strong> Activos</Typography>
+        </Stack>
       )}
-    </div>
+    </Box>
   );
 };
 
-export default Historial; 
+export default Historial;

@@ -4,160 +4,84 @@ import { useScannedCodeContext } from '../context/ScannedCodeContext';
 import { useScanContext } from '../context/ScanContext';
 import { formatCodeForDisplay } from '../api';
 import ReportIssueModal from '../components/ReportIssueModal/ReportIssueModal';
-import './Dashboard.css';
+import { Box, Stack, Button, Card, CardContent, Typography } from '../components/ui';
 
 const Dashboard: React.FC = () => {
   const navigate = useNavigate();
-  const { data: oldData, history: oldHistory } = useScannedCodeContext();
-  const { data: scanData, history: scanHistory } = useScanContext();
+  const { data: oldData } = useScannedCodeContext();
+  const { data: scanData } = useScanContext();
   const [showReportModal, setShowReportModal] = useState(false);
 
-  // Use the new scan data if available, otherwise fallback to old data
-  const history = scanHistory.length > 0 ? scanHistory : oldHistory;
-
-  const handleRegistrarCaja = () => {
-    navigate('/registrar-caja');
-  };
-
-  const handleReportClick = () => {
-    setShowReportModal(true);
-  };
+  const handleRegistrarCaja = () => navigate('/registrar-caja');
+  const handleReportClick = () => setShowReportModal(true);
 
   const renderData = () => {
     if (scanData) {
-      // New scan data format
       return (
-        <div className="last-scan-section">
-          <h3 className="section-title">Último Código Procesado</h3>
-          <div className="scan-result-card">
-            <div className="result-header">
-              <span className="code-display">
-                {formatCodeForDisplay(scanData.data?.codigo || '')}
-              </span>
-              <span className={`code-type ${scanData.data?.tipo?.toLowerCase()}`}>
-                {scanData.data?.tipo === 'BOX' ? 'Caja' : 'Pallet'}
-              </span>
-            </div>
-            
-            <div className="result-details">
-              <div className="detail-row">
-                <span className="detail-label">Ubicación:</span>
-                <span className="detail-value">{scanData.data?.ubicacion}</span>
-              </div>
-              
-              <div className="detail-row">
-                <span className="detail-label">Estado:</span>
-                <span className={`status-badge ${scanData.data?.estado}`}>
-                  {scanData.data?.estado ? 
-                    scanData.data.estado.charAt(0).toUpperCase() + scanData.data.estado.slice(1) :
-                    'Desconocido'
-                  }
-                </span>
-              </div>
-
-              <div className="detail-row">
-                <span className="detail-label">Mensaje:</span>
-                <span className="detail-value">{scanData.message}</span>
-              </div>
-            </div>
-          </div>
-        </div>
+        <Box mt={3}>
+          <Typography variant="h6" gutterBottom>Último Código Procesado</Typography>
+          <Card variant="outlined">
+            <CardContent>
+              <Box display="flex" justifyContent="space-between" alignItems="center" mb={1}>
+                <Typography variant="h6" component="span">{formatCodeForDisplay(scanData.data?.codigo || '')}</Typography>
+                <Typography variant="body2" color="text.secondary" component="span">
+                  {scanData.data?.tipo === 'BOX' ? 'Caja' : 'Pallet'}
+                </Typography>
+              </Box>
+              <Typography variant="body2"><strong>Ubicación:</strong> {scanData.data?.ubicacion}</Typography>
+              <Typography variant="body2"><strong>Estado:</strong> {scanData.data?.estado ? scanData.data.estado.charAt(0).toUpperCase() + scanData.data.estado.slice(1) : 'Desconocido'}</Typography>
+              <Typography variant="body2"><strong>Mensaje:</strong> {scanData.message}</Typography>
+            </CardContent>
+          </Card>
+        </Box>
       );
-    } else if (oldData) {
-      // Legacy data format
+    }
+    if (oldData) {
       return (
-        <div className="last-scan-section">
-          <h3 className="section-title">Último Código Escaneado</h3>
-          <div className="scan-result-card">
-            <div className="result-header">
-              <span className="code-display">
-                {formatCodeForDisplay(oldData.codigo)}
-              </span>
-              <span className={`code-type ${oldData.tipo}`}>
-                {oldData.tipo === 'caja' ? 'Caja' : 'Pallet'}
-              </span>
-            </div>
-            
-            <div className="result-details">
-              {oldData.producto && (
-                <div className="detail-row">
-                  <span className="detail-label">Producto:</span>
-                  <span className="detail-value">{oldData.producto.nombre}</span>
-                </div>
-              )}
-              
-              {oldData.ubicacion && (
-                <div className="detail-row">
-                  <span className="detail-label">Ubicación:</span>
-                  <span className="detail-value">
-                    {oldData.ubicacion.almacen} - {oldData.ubicacion.zona}
-                  </span>
-                </div>
-              )}
-              
-              <div className="detail-row">
-                <span className="detail-label">Estado:</span>
-                <span className={`status-badge ${oldData.estado}`}>
-                  {oldData.estado.charAt(0).toUpperCase() + oldData.estado.slice(1)}
-                </span>
-              </div>
-            </div>
-          </div>
-        </div>
+        <Box mt={3}>
+          <Typography variant="h6" gutterBottom>Último Código Escaneado</Typography>
+          <Card variant="outlined">
+            <CardContent>
+              <Box display="flex" justifyContent="space-between" alignItems="center" mb={1}>
+                <Typography variant="h6" component="span">{formatCodeForDisplay(oldData.codigo)}</Typography>
+                <Typography variant="body2" color="text.secondary" component="span">
+                  {oldData.tipo === 'caja' ? 'Caja' : 'Pallet'}
+                </Typography>
+              </Box>
+              {oldData.producto && <Typography variant="body2"><strong>Producto:</strong> {oldData.producto.nombre}</Typography>}
+              {oldData.ubicacion && <Typography variant="body2"><strong>Ubicación:</strong> {oldData.ubicacion.almacen} - {oldData.ubicacion.zona}</Typography>}
+              <Typography variant="body2"><strong>Estado:</strong> {oldData.estado.charAt(0).toUpperCase() + oldData.estado.slice(1)}</Typography>
+            </CardContent>
+          </Card>
+        </Box>
       );
     }
     return null;
   };
 
-
   return (
-    <div className="dashboard-content">
-      {/* Sección de Acciones */}
-      <div className="actions-section">
-        <button 
-          className="action-btn primary"
-          onClick={handleRegistrarCaja}
-        >
-          <span className="btn-text">Recibir Pallets o Cajas</span>
-        </button>
-
-        <button 
-          className="action-btn"
-          onClick={() => navigate('/consultar-codigo')}
-        >
-          <span className="btn-text">Consultar Código</span>
-        </button>
-
-        <button 
-          className="action-btn"
-          onClick={() => navigate('/crear-pallet')}
-        >
-          <span className="btn-text">Crear Pallet</span>
-        </button>
-
-        <button 
-          className="action-btn"
-          onClick={() => navigate('/sales/select')}
-        >
-          <span className="btn-text">Agregar a Venta</span>
-        </button>
-        
-        <button className="action-btn"
-        onClick={handleReportClick}>
-          <span className="btn-text">Registrar Problema</span>
-        </button>
-      </div>
-
-      {/* Último Código Procesado */}
+    <Box>
+      <Stack direction="column" spacing={2} useFlexGap flexWrap="wrap">
+        <Button variant="contained" onClick={handleRegistrarCaja} fullWidth>
+          Recibir Pallets o Cajas
+        </Button>
+        <Button variant="outlined" onClick={() => navigate('/consultar-codigo')} fullWidth>
+          Consultar Código
+        </Button>
+        <Button variant="outlined" onClick={() => navigate('/crear-pallet')} fullWidth>
+          Crear Pallet
+        </Button>
+        <Button variant="outlined" onClick={() => navigate('/sales/select')} fullWidth>
+          Agregar a Venta
+        </Button>
+        <Button variant="outlined" onClick={handleReportClick} fullWidth>
+          Registrar Problema
+        </Button>
+      </Stack>
       {renderData()}
-
-      {/* Modal de Reporte de Problemas */}
-      <ReportIssueModal 
-        isOpen={showReportModal}
-        onClose={() => setShowReportModal(false)}
-      />
-    </div>
+      <ReportIssueModal isOpen={showReportModal} onClose={() => setShowReportModal(false)} />
+    </Box>
   );
 };
 
-export default Dashboard; 
+export default Dashboard;

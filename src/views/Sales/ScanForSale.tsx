@@ -2,7 +2,20 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { validateScannedCode, formatCodeForDisplay } from '../../api';
 import { submitAddBoxesToSale, type AddBoxesToSaleResponse } from '../../api';
-import './ScanForSale.css';
+import { formatDate } from '../../utils/dateFormatters';
+import { error as logError } from '../../utils/logger';
+import { getErrorMessage } from '../../utils/errorHandler';
+import {
+  Box,
+  Stack,
+  Typography,
+  Button,
+  TextField,
+  Alert,
+  Card,
+  CardContent,
+  Chip,
+} from '../../components/ui';
 
 interface ScannedItem {
   code: string;
@@ -41,14 +54,12 @@ const ScanForSale: React.FC = () => {
       return;
     }
 
-    // Client-side validation
     const validation = validateScannedCode(codigo);
     if (!validation.isValid) {
       setError(validation.errorMessage || 'Código inválido');
       return;
     }
 
-    // Check if already scanned in this session
     if (scannedItems.some((item) => item.code === codigo.trim())) {
       setError('Este código ya fue escaneado en esta sesión');
       return;
@@ -69,7 +80,6 @@ const ScanForSale: React.FC = () => {
       const response = await submitAddBoxesToSale(request);
       setSaleInfo(response);
 
-      // Add to scanned items
       const newItem: ScannedItem = {
         code: codigo.trim(),
         type: validation.type || 'box',
@@ -83,20 +93,16 @@ const ScanForSale: React.FC = () => {
       );
       setCodigo('');
 
-      // Clear success message after 3 seconds
-      setTimeout(() => {
-        setSuccess(null);
-      }, 3000);
+      setTimeout(() => setSuccess(null), 3000);
 
-      // Refocus input
       if (inputRef.current) {
         inputRef.current.focus();
       }
-    } catch (err: any) {
-      console.error('Error adding to sale:', err);
-      setError(err.message || 'Error al agregar el item a la venta');
+    } catch (err: unknown) {
+      const message = getErrorMessage(err, 'Error al agregar el item a la venta');
+      logError('Error adding to sale:', err);
+      setError(message);
 
-      // Add failed item to list
       const newItem: ScannedItem = {
         code: codigo.trim(),
         type: validation.type || 'box',
@@ -113,169 +119,170 @@ const ScanForSale: React.FC = () => {
     navigate('/sales/select');
   };
 
-  const formatDate = (dateString: string) => {
-    try {
-      const date = new Date(dateString);
-      const now = new Date();
-      const diffInMs = now.getTime() - date.getTime();
-      const diffInSeconds = Math.floor(diffInMs / 1000);
-
-      if (diffInSeconds < 60) {
-        return 'hace unos segundos';
-      } else if (diffInSeconds < 3600) {
-        const minutes = Math.floor(diffInSeconds / 60);
-        return `hace ${minutes} minuto${minutes !== 1 ? 's' : ''}`;
-      } else {
-        return date.toLocaleTimeString('es-ES', {
-          hour: '2-digit',
-          minute: '2-digit',
-        });
-      }
-    } catch (e) {
-      return dateString;
-    }
-  };
 
   return (
-    <div className="scan-for-sale">
-      <div className="header">
-        <button onClick={handleBack} className="back-btn">
-          ← Volver
-        </button>
-        <h2>📦 Agregar a Venta</h2>
-        <p>Escanea códigos de cajas o pallets para agregarlos</p>
+    <Box sx={{ p: 2 }}>
+      <Stack spacing={2}>
+        <Stack direction="row" alignItems="center" justifyContent="space-between" flexWrap="wrap" gap={1}>
+          <Button onClick={handleBack} size="small">
+            ← Volver
+          </Button>
+          <Typography variant="h6">Agregar a Venta</Typography>
+        </Stack>
+        <Typography variant="body2" color="text.secondary">
+          Escanea códigos de cajas o pallets para agregarlos
+        </Typography>
         {saleId && (
-          <div className="sale-id-display">Venta: {saleId.slice(0, 8)}...</div>
-        )}
-      </div>
-
-      {/* Scan Form */}
-      <form onSubmit={handleSubmit} className="scan-form">
-        <div className="input-group">
-          <input
-            ref={inputRef}
-            type="text"
-            value={codigo}
-            onChange={(e) => setCodigo(e.target.value)}
-            placeholder="Escanea o ingresa el código (14 o 15 dígitos)"
-            className="code-input"
-            disabled={loading}
-            autoFocus
-          />
-          <button
-            type="submit"
-            className="scan-button"
-            disabled={loading || !codigo.trim()}
-          >
-            {loading ? '🔄' : '✓'}
-          </button>
-        </div>
-
-        {error && (
-          <div className="error-message">
-            ⚠️ {error}
-          </div>
+          <Typography variant="caption" color="text.secondary">
+            Venta: {saleId.slice(0, 8)}...
+          </Typography>
         )}
 
-        {success && (
-          <div className="success-message">
-            ✅ {success}
-          </div>
-        )}
-      </form>
-
-      {/* Sale Progress */}
-      {saleInfo && (
-        <div className="sale-progress">
-          <h3>Progreso de la Venta</h3>
-          <div className="progress-stats">
-            <div className="stat-item">
-              <span className="stat-label">Cajas Totales:</span>
-              <span className="stat-value">
-                {saleInfo.sale.totalBoxCount || saleInfo.sale.totalBoxes || 0}
-              </span>
-            </div>
-            {saleInfo.sale.totalEggs && (
-              <div className="stat-item">
-                <span className="stat-label">Huevos Totales:</span>
-                <span className="stat-value">{saleInfo.sale.totalEggs}</span>
-              </div>
-            )}
-            {saleInfo.isComplete && (
-              <div className="complete-badge">✓ Completa</div>
-            )}
-          </div>
-
-          {Object.keys(saleInfo.boxesByCalibre).length > 0 && (
-            <div className="calibre-breakdown">
-              <h4>Cajas por Calibre:</h4>
-              <div className="calibre-list">
-                {Object.entries(saleInfo.boxesByCalibre).map(([calibre, count]) => (
-                  <div key={calibre} className="calibre-item">
-                    <span className="calibre-label">Calibre {calibre}:</span>
-                    <span className="calibre-count">{count}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {Object.keys(saleInfo.remainingBoxes).length > 0 && (
-            <div className="remaining-boxes">
-              <h4>Faltan:</h4>
-              <div className="remaining-list">
-                {Object.entries(saleInfo.remainingBoxes).map(([calibre, count]) => (
-                  <div key={calibre} className="remaining-item">
-                    <span className="remaining-label">Calibre {calibre}:</span>
-                    <span className="remaining-count">{count} cajas</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-        </div>
-      )}
-
-      {/* Scanned Items List */}
-      {scannedItems.length > 0 && (
-        <div className="scanned-items">
-          <h3>Items Escaneados ({scannedItems.length})</h3>
-          <div className="items-list">
-            {scannedItems.map((item, index) => (
-              <div
-                key={`${item.code}-${index}`}
-                className={`item-card ${item.success ? 'success' : 'error'}`}
+        <Box component="form" onSubmit={handleSubmit}>
+          <Stack spacing={1.5}>
+            <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1} alignItems="flex-start">
+              <TextField
+                inputRef={inputRef}
+                value={codigo}
+                onChange={(e) => setCodigo(e.target.value)}
+                placeholder="Escanea o ingresa el código (14 o 15 dígitos)"
+                disabled={loading}
+                autoFocus
+                fullWidth
+                size="small"
+              />
+              <Button
+                type="submit"
+                variant="contained"
+                disabled={loading || !codigo.trim()}
+                fullWidth
+                sx={{ width: { xs: '100%', sm: 'auto' }, minWidth: { sm: 48 } }}
               >
-                <div className="item-header">
-                  <div className="item-code">
-                    {formatCodeForDisplay(item.code)}
-                  </div>
-                  <div className="item-type">
-                    {item.type === 'box' ? '📦 Caja' : '🚛 Pallet'}
-                  </div>
-                </div>
-                <div className="item-footer">
-                  <div className="item-status">
-                    {item.success ? '✅ Agregado' : '❌ Error'}
-                  </div>
-                  <div className="item-time">{formatDate(item.timestamp)}</div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-    </div>
+                {loading ? '…' : '✓'}
+              </Button>
+            </Stack>
+            {error && <Alert severity="error">{error}</Alert>}
+            {success && <Alert severity="success">{success}</Alert>}
+          </Stack>
+        </Box>
+
+        {saleInfo && (
+          <Card variant="outlined">
+            <CardContent>
+              <Stack spacing={2}>
+                <Typography variant="subtitle1" fontWeight={600}>
+                  Progreso de la Venta
+                </Typography>
+                <Stack direction="row" spacing={2} flexWrap="wrap" alignItems="center">
+                  <Typography variant="body2">
+                    Cajas Totales:{' '}
+                    <strong>
+                      {saleInfo.sale.totalBoxCount ?? saleInfo.sale.totalBoxes ?? 0}
+                    </strong>
+                  </Typography>
+                  {saleInfo.sale.totalEggs != null && (
+                    <Typography variant="body2">
+                      Huevos Totales: <strong>{saleInfo.sale.totalEggs}</strong>
+                    </Typography>
+                  )}
+                  {saleInfo.isComplete && (
+                    <Chip label="Completa" color="success" size="small" />
+                  )}
+                </Stack>
+
+                {Object.keys(saleInfo.boxesByCalibre).length > 0 && (
+                  <Box>
+                    <Typography variant="subtitle2" gutterBottom>
+                      Cajas por Calibre
+                    </Typography>
+                    <Stack direction="row" flexWrap="wrap" gap={0.5}>
+                      {Object.entries(saleInfo.boxesByCalibre).map(([calibre, count]) => (
+                        <Chip
+                          key={calibre}
+                          label={`Calibre ${calibre}: ${count}`}
+                          size="small"
+                          variant="outlined"
+                        />
+                      ))}
+                    </Stack>
+                  </Box>
+                )}
+
+                {Object.keys(saleInfo.remainingBoxes).length > 0 && (
+                  <Box>
+                    <Typography variant="subtitle2" gutterBottom>
+                      Faltan
+                    </Typography>
+                    <Stack direction="row" flexWrap="wrap" gap={0.5}>
+                      {Object.entries(saleInfo.remainingBoxes).map(([calibre, count]) => (
+                        <Chip
+                          key={calibre}
+                          label={`Calibre ${calibre}: ${count} cajas`}
+                          size="small"
+                          color="warning"
+                          variant="outlined"
+                        />
+                      ))}
+                    </Stack>
+                  </Box>
+                )}
+              </Stack>
+            </CardContent>
+          </Card>
+        )}
+
+        {scannedItems.length > 0 && (
+          <Box>
+            <Typography variant="subtitle1" fontWeight={600} gutterBottom>
+              Items Escaneados ({scannedItems.length})
+            </Typography>
+            <Stack spacing={1}>
+              {scannedItems.map((item, index) => (
+                <Card
+                  key={`${item.code}-${index}`}
+                  variant="outlined"
+                  sx={{
+                    borderLeft: 3,
+                    borderLeftColor: item.success ? 'success.main' : 'error.main',
+                  }}
+                >
+                  <CardContent sx={{ py: 1, '&:last-child': { pb: 1 } }}>
+                    <Stack
+                      direction="row"
+                      justifyContent="space-between"
+                      alignItems="center"
+                      flexWrap="wrap"
+                      gap={0.5}
+                    >
+                      <Typography variant="body2" fontFamily="monospace">
+                        {formatCodeForDisplay(item.code)}
+                      </Typography>
+                      <Typography variant="caption" color="text.secondary">
+                        {item.type === 'box' ? 'Caja' : 'Pallet'}
+                      </Typography>
+                    </Stack>
+                    <Stack
+                      direction="row"
+                      justifyContent="space-between"
+                      alignItems="center"
+                      mt={0.5}
+                    >
+                      <Typography variant="caption">
+                        {item.success ? 'Agregado' : 'Error'}
+                      </Typography>
+                      <Typography variant="caption" color="text.secondary">
+                        {formatDate(item.timestamp)}
+                      </Typography>
+                    </Stack>
+                  </CardContent>
+                </Card>
+              ))}
+            </Stack>
+          </Box>
+        )}
+      </Stack>
+    </Box>
   );
 };
 
 export default ScanForSale;
-
-
-
-
-
-
-
-
-

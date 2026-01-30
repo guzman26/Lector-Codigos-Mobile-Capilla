@@ -1,5 +1,5 @@
 import React from 'react';
-import './Footer.css';
+import { Box, BottomNavigation, BottomNavigationAction } from '../ui';
 
 interface NavTab {
   id: string;
@@ -14,30 +14,26 @@ interface FooterProps {
 }
 
 const Footer: React.FC<FooterProps> = ({ tabs, onTabClick }) => {
-  const handleTabClick = (tabId: string) => {
-    onTabClick(tabId);
-  };
+  const activeTabId = tabs.find(t => t.isActive)?.id ?? tabs[0]?.id;
 
   return (
-    <footer className="footer">
-      <nav className="footer-nav">
-        {tabs.map((tab) => (
-          <button
+    <Box sx={{ borderTop: 1, borderColor: 'divider' }}>
+      <BottomNavigation
+        value={activeTabId}
+        onChange={(_e, value) => onTabClick(value)}
+        showLabels
+      >
+        {tabs.map(tab => (
+          <BottomNavigationAction
             key={tab.id}
-            className={`nav-tab ${tab.isActive ? 'active' : ''}`}
-            onClick={() => handleTabClick(tab.id)}
-            type="button"
-            aria-label={tab.label}
-          >
-            <span className="nav-icon" aria-hidden="true">
-              {tab.icon}
-            </span>
-            <span className="nav-label">{tab.label}</span>
-          </button>
+            value={tab.id}
+            label={tab.label}
+            icon={<span aria-hidden="true">{tab.icon}</span>}
+          />
         ))}
-      </nav>
-    </footer>
+      </BottomNavigation>
+    </Box>
   );
 };
 
-export default Footer; 
+export default Footer;

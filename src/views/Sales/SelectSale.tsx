@@ -1,7 +1,19 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getDraftSales, type SalesOrder } from '../../api';
-import './SelectSale.css';
+import { getErrorMessage } from '../../utils/errorHandler';
+import { formatFullDate } from '../../utils/dateFormatters';
+import {
+  Box,
+  Stack,
+  Typography,
+  Button,
+  TextField,
+  Alert,
+  Card,
+  CardContent,
+  Chip,
+} from '../../components/ui';
 
 const SelectSale: React.FC = () => {
   const navigate = useNavigate();
@@ -24,36 +36,16 @@ const SelectSale: React.FC = () => {
       } else {
         setError(response.error || 'No se pudieron cargar las ventas');
       }
-    } catch (err: any) {
-      console.error('Error loading draft sales:', err);
-      setError(err.message || 'Error al cargar las ventas');
+    } catch (err: unknown) {
+      setError(getErrorMessage(err, 'Error al cargar las ventas'));
     } finally {
       setLoading(false);
     }
   };
 
-  const handleSelectSale = (saleId: string) => {
-    navigate(`/sales/scan/${saleId}`);
-  };
+  const handleSelectSale = (saleId: string) => navigate(`/sales/scan/${saleId}`);
+  const handleBack = () => navigate('/dashboard');
 
-  const handleBack = () => {
-    navigate('/dashboard');
-  };
-
-  const formatDate = (dateString: string) => {
-    try {
-      const date = new Date(dateString);
-      return date.toLocaleDateString('es-ES', {
-        day: '2-digit',
-        month: '2-digit',
-        year: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit',
-      });
-    } catch (e) {
-      return dateString;
-    }
-  };
 
   const filteredSales = sales.filter((sale) => {
     if (!searchTerm.trim()) return true;
@@ -67,123 +59,67 @@ const SelectSale: React.FC = () => {
   });
 
   return (
-    <div className="select-sale">
-      <div className="header">
-        <button onClick={handleBack} className="back-btn">
-          ← Volver
-        </button>
-        <h2>📋 Seleccionar Venta</h2>
-        <p>Selecciona una venta en borrador para agregar items</p>
-      </div>
+    <Box>
+      <Stack spacing={2} mb={2}>
+        <Button variant="outlined" size="small" onClick={handleBack}>← Volver</Button>
+        <Typography variant="h5">📋 Seleccionar Venta</Typography>
+        <Typography variant="body2" color="text.secondary">Selecciona una venta en borrador para agregar items</Typography>
+      </Stack>
 
-      {/* Search Bar */}
-      <div className="search-section">
-        <input
-          type="text"
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          placeholder="Buscar por ID, cliente, email o teléfono..."
-          className="search-input"
-        />
-      </div>
+      <TextField
+        placeholder="Buscar por ID, cliente, email o teléfono..."
+        value={searchTerm}
+        onChange={e => setSearchTerm(e.target.value)}
+        size="small"
+        fullWidth
+        sx={{ mb: 2 }}
+      />
 
-      {/* Loading State */}
       {loading && (
-        <div className="loading-container">
-          <div className="loading-spinner">🔄</div>
-          <p>Cargando ventas...</p>
-        </div>
+        <Box py={3} textAlign="center">
+          <Typography color="text.secondary">🔄 Cargando ventas...</Typography>
+        </Box>
       )}
 
-      {/* Error State */}
       {error && !loading && (
-        <div className="error-container">
-          <div className="error-message">⚠️ {error}</div>
-          <button onClick={loadDraftSales} className="retry-btn">
-            Reintentar
-          </button>
-        </div>
+        <Alert severity="error" sx={{ mb: 2 }} action={<Button size="small" onClick={loadDraftSales}>Reintentar</Button>}>
+          {error}
+        </Alert>
       )}
 
-      {/* Empty State */}
       {!loading && !error && filteredSales.length === 0 && (
-        <div className="empty-container">
-          <div className="empty-icon">📭</div>
-          <p>
-            {searchTerm
-              ? 'No se encontraron ventas que coincidan con la búsqueda'
-              : 'No hay ventas en borrador disponibles'}
-          </p>
-          {!searchTerm && (
-            <button onClick={loadDraftSales} className="refresh-btn">
-              Actualizar
-            </button>
-          )}
-        </div>
+        <Box py={3} textAlign="center">
+          <Typography color="text.secondary">
+            {searchTerm ? 'No se encontraron ventas que coincidan con la búsqueda' : 'No hay ventas en borrador disponibles'}
+          </Typography>
+          {!searchTerm && <Button variant="outlined" sx={{ mt: 1 }} onClick={loadDraftSales}>Actualizar</Button>}
+        </Box>
       )}
 
-      {/* Sales List */}
       {!loading && !error && filteredSales.length > 0 && (
-        <div className="sales-list">
+        <Stack spacing={2}>
           {filteredSales.map((sale) => (
-            <div
-              key={sale.id}
-              className="sale-card"
-              onClick={() => handleSelectSale(sale.id)}
-            >
-              <div className="sale-header">
-                <div className="sale-id">Venta: {sale.saleId.slice(0, 8)}...</div>
-                <span className="state-badge draft">DRAFT</span>
-              </div>
-
-              <div className="sale-customer">
-                <div className="customer-name">
-                  👤 {sale.customerInfo.name}
-                </div>
-                {sale.customerInfo.email && (
-                  <div className="customer-email">📧 {sale.customerInfo.email}</div>
-                )}
-                {sale.customerInfo.phone && (
-                  <div className="customer-phone">📞 {sale.customerInfo.phone}</div>
-                )}
-              </div>
-
-              <div className="sale-stats">
-                <div className="stat-item">
-                  <span className="stat-label">Cajas:</span>
-                  <span className="stat-value">
-                    {sale.totalBoxCount || sale.totalBoxes || 0}
-                  </span>
-                </div>
-                {sale.totalEggs && (
-                  <div className="stat-item">
-                    <span className="stat-label">Huevos:</span>
-                    <span className="stat-value">{sale.totalEggs}</span>
-                  </div>
-                )}
-              </div>
-
-              <div className="sale-footer">
-                <div className="sale-date">
-                  Creada: {formatDate(sale.createdAt)}
-                </div>
-                <div className="select-arrow">→</div>
-              </div>
-            </div>
+            <Card key={sale.id} variant="outlined" sx={{ cursor: 'pointer' }} onClick={() => handleSelectSale(sale.id)}>
+              <CardContent>
+                <Stack direction="row" justifyContent="space-between" alignItems="center" flexWrap="wrap" gap={1} mb={1}>
+                  <Typography variant="subtitle1">Venta: {sale.saleId.slice(0, 8)}...</Typography>
+                  <Chip label="DRAFT" size="small" variant="outlined" />
+                </Stack>
+                <Typography variant="body2">👤 {sale.customerInfo.name}</Typography>
+                {sale.customerInfo.email && <Typography variant="caption">📧 {sale.customerInfo.email}</Typography>}
+                {sale.customerInfo.phone && <Typography variant="caption">📞 {sale.customerInfo.phone}</Typography>}
+                <Stack direction="row" spacing={2} sx={{ mt: 1 }}>
+                  <Typography variant="body2" color="text.secondary">Cajas: {sale.totalBoxCount ?? sale.totalBoxes ?? 0}</Typography>
+                  {sale.totalEggs != null && <Typography variant="body2" color="text.secondary">Huevos: {sale.totalEggs}</Typography>}
+                </Stack>
+                <Typography variant="caption" color="text.secondary">Creada: {formatFullDate(sale.createdAt)}</Typography>
+              </CardContent>
+            </Card>
           ))}
-        </div>
+        </Stack>
       )}
-    </div>
+    </Box>
   );
 };
 
 export default SelectSale;
-
-
-
-
-
-
-
-
-

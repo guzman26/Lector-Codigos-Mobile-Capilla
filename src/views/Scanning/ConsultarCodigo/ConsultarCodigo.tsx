@@ -1,9 +1,26 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { ScannedCodeInfo } from '../../../api/types';
 import { validateScannedCode } from '../../../utils/validators';
-import './ConsultarCodigo.css';
+import { formatDate } from '../../../utils/dateFormatters';
+import { getErrorMessage } from '../../../utils/errorHandler';
 import { useNavigate } from 'react-router-dom';
 import { useScannedCodeContext } from '../../../context/ScannedCodeContext';
+import { useLocalStorage } from '../../../hooks/useLocalStorage';
+import {
+  Box,
+  Stack,
+  Button,
+  TextField,
+  Card,
+  CardContent,
+  Typography,
+  Alert,
+  Chip,
+  Grid,
+  List,
+  ListItem,
+  ListItemButton,
+} from '../../../components/ui';
 
 interface ConsultaResult extends ScannedCodeInfo {
   timestamp: string;
@@ -14,63 +31,49 @@ const ConsultarCodigo: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [result, setResult] = useState<ConsultaResult | null>(null);
-  const [recentSearches, setRecentSearches] = useState<ConsultaResult[]>([]);
+  const [recentSearches, setRecentSearches] = useLocalStorage<ConsultaResult[]>(
+    'consultar-codigo-history',
+    []
+  );
   const inputRef = useRef<HTMLInputElement>(null);
   const navigate = useNavigate();
   const { getCodeInfo, data } = useScannedCodeContext();
-  // Load recent searches from localStorage on component mount
-  useEffect(() => {
-    const saved = localStorage.getItem('consultar-codigo-history');
-    if (saved) {
-      try {
-        setRecentSearches(JSON.parse(saved));
-      } catch (e) {
-        console.warn('Error loading search history:', e);
-      }
-    }
-  }, []);
 
-  // Save recent searches to localStorage
   const saveToHistory = (searchResult: ConsultaResult) => {
-    const updated = [searchResult, ...recentSearches.filter(r => r.codigo !== searchResult.codigo)].slice(0, 5);
-    setRecentSearches(updated);
-    localStorage.setItem('consultar-codigo-history', JSON.stringify(updated));
+    setRecentSearches((prev) => {
+      const updated = [
+        searchResult,
+        ...prev.filter(r => r.codigo !== searchResult.codigo),
+      ].slice(0, 5);
+      return updated;
+    });
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
     if (!codigo.trim()) {
       setError('Por favor ingresa un código');
       return;
     }
-
-    // Client-side validation
     const validation = validateScannedCode(codigo);
     if (!validation.isValid) {
       setError(validation.errorMessage || 'Código inválido');
       return;
     }
-
     setLoading(true);
     setError(null);
-    console.log('🔍 Consultando código:', codigo.trim());
     try {
       await getCodeInfo(codigo.trim());
       if (data) {
-        const resultWithTimestamp: ConsultaResult = {
-          ...data,
-          timestamp: new Date().toISOString()
-        };
+        const resultWithTimestamp: ConsultaResult = { ...data, timestamp: new Date().toISOString() };
         setResult(resultWithTimestamp);
         saveToHistory(resultWithTimestamp);
       } else {
         setError('No se encontró información para este código');
       }
-      setCodigo(''); // Clear input after successful search
-    } catch (err: any) {
-      console.error('Error consultando código:', err);
-      setError(err.message || 'Error al consultar el código');
+      setCodigo('');
+    } catch (err: unknown) {
+      setError(getErrorMessage(err, 'Error al consultar el código'));
       setResult(null);
     } finally {
       setLoading(false);
@@ -83,239 +86,134 @@ const ConsultarCodigo: React.FC = () => {
     inputRef.current?.focus();
   };
 
-  const handleKeyPress = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter') {
-      handleSubmit(e as any);
-    }
-  };
+  const handleBack = () => navigate('/dashboard');
 
-  const handleBack = () => {
-    navigate('/dashboard');
-  };
-
-  const formatDate = (dateString: string) => {
-    try {
-      const date = new Date(dateString);
-      const now = new Date();
-      const diffInMs = now.getTime() - date.getTime();
-      const diffInMinutes = Math.floor(diffInMs / (1000 * 60));
-      const diffInHours = Math.floor(diffInMs / (1000 * 60 * 60));
-      const diffInDays = Math.floor(diffInMs / (1000 * 60 * 60 * 24));
-
-      if (diffInMinutes < 1) {
-        return 'hace unos segundos';
-      } else if (diffInMinutes < 60) {
-        return `hace ${diffInMinutes} minuto${diffInMinutes !== 1 ? 's' : ''}`;
-      } else if (diffInHours < 24) {
-        return `hace ${diffInHours} hora${diffInHours !== 1 ? 's' : ''}`;
-      } else if (diffInDays < 30) {
-        return `hace ${diffInDays} día${diffInDays !== 1 ? 's' : ''}`;
-      } else {
-        return date.toLocaleDateString('es-ES');
-      }
-    } catch (e) {
-      return 'Fecha inválida';
-    }
-  };
-
-  const getTypeClass = (tipo: string) => {
-    return tipo === 'caja' ? 'type-box' : 'type-pallet';
-  };
-
-  const getStatusClass = (estado: string) => {
-    switch (estado.toLowerCase()) {
-      case 'activo':
-        return 'status-active';
-      case 'inactivo':
-        return 'status-inactive';
-      case 'bloqueado':
-        return 'status-blocked';
-      default:
-        return 'status-unknown';
-    }
-  };
 
   const renderActionButtons = (item: ConsultaResult) => {
     if (item.tipo === 'caja') {
       return (
-        <div className="action-buttons">
-          <button className="btn-action btn-move">
-            📦 Mover Caja
-          </button>
-          <button className="btn-action btn-details">
-            ℹ️ Ver Detalles
-          </button>
-        </div>
-      );
-    } else {
-      return (
-        <div className="action-buttons">
-          <button className="btn-action btn-move">
-            🚛 Mover Pallet
-          </button>
-          <button className="btn-action btn-contents">
-            📋 Ver Contenido
-          </button>
-          <button className="btn-action btn-details">
-            ℹ️ Ver Detalles
-          </button>
-        </div>
+        <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
+          <Button variant="contained" size="small">📦 Mover Caja</Button>
+          <Button variant="outlined" size="small">ℹ️ Ver Detalles</Button>
+        </Stack>
       );
     }
+    return (
+      <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
+        <Button variant="contained" size="small">🚛 Mover Pallet</Button>
+        <Button variant="outlined" size="small">📋 Ver Contenido</Button>
+        <Button variant="outlined" size="small">ℹ️ Ver Detalles</Button>
+      </Stack>
+    );
   };
 
   return (
-    <div className="consultar-codigo">
-      <div className="header">
-        <button onClick={handleBack} className="back-btn">
-          ← Volver
-        </button>
-        <h2>🔍 Consultar Código</h2>
-        <p>Ingresa un código para consultar su información</p>
-      </div>
+    <Box>
+      <Stack direction="row" alignItems="center" spacing={2} mb={2}>
+        <Button onClick={handleBack} variant="outlined" size="small">← Volver</Button>
+        <Box>
+          <Typography variant="h5">🔍 Consultar Código</Typography>
+          <Typography variant="body2" color="text.secondary">Ingresa un código para consultar su información</Typography>
+        </Box>
+      </Stack>
 
-      {/* Search Form */}
-      <form onSubmit={handleSubmit} className="search-form">
-        <div className="input-group">
-          <input
-            ref={inputRef}
-            type="text"
+      <form onSubmit={handleSubmit}>
+        <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1} alignItems="flex-start" mb={2}>
+          <TextField
+            inputRef={inputRef}
+            size="small"
+            fullWidth
             value={codigo}
-            onChange={(e) => setCodigo(e.target.value)}
-            onKeyPress={handleKeyPress}
+            onChange={e => setCodigo(e.target.value)}
             placeholder="Escanea o ingresa el código (14 o 15 dígitos)"
-            className="code-input"
             disabled={loading}
-            autoFocus
+            onKeyDown={e => e.key === 'Enter' && handleSubmit(e as unknown as React.FormEvent)}
           />
-          <button 
-            type="submit" 
-            className="search-button"
-            disabled={loading || !codigo.trim()}
-          >
-            {loading ? '🔄' : '🔍'}
-          </button>
-        </div>
-        
-        {error && (
-          <div className="error-message">
-            ⚠️ {error}
-          </div>
-        )}
+          <Button type="submit" variant="contained" disabled={loading || !codigo.trim()}>
+            {loading ? '🔄' : '🔍 Buscar'}
+          </Button>
+        </Stack>
+        {error && <Alert severity="error" sx={{ mb: 2 }}>⚠️ {error}</Alert>}
       </form>
 
-      {/* Search Result */}
       {result && (
-        <div className="result-container">
-          <div className="result-header">
-            <h3>📋 Información del Código</h3>
-            <small>Consultado {formatDate(result.timestamp)}</small>
-          </div>
+        <Box mt={3}>
+          <Card variant="outlined" sx={{ mb: 2 }}>
+            <CardContent>
+              <Box display="flex" flexWrap="wrap" gap={1} alignItems="center" justifyContent="space-between" mb={1}>
+                <Typography variant="h6">{result.codigo}</Typography>
+                <Typography variant="caption" color="text.secondary">Consultado {formatDate(result.timestamp)}</Typography>
+              </Box>
+              <Stack direction="row" spacing={1} flexWrap="wrap">
+                <Chip label={result.tipo === 'caja' ? '📦 Caja' : '🚛 Pallet'} size="small" />
+                <Chip label={result.estado} size="small" variant="outlined" />
+              </Stack>
+            </CardContent>
+          </Card>
 
-          <div className="result-content">
-            {/* Code Display */}
-            <div className="code-display">
-              <div className="code-value">{result.codigo}</div>
-              <div className="code-badges">
-                <span className={`badge ${getTypeClass(result.tipo)}`}>
-                  {result.tipo === 'caja' ? '📦 Caja' : '🚛 Pallet'}
-                </span>
-                <span className={`badge ${getStatusClass(result.estado)}`}>
-                  {result.estado}
-                </span>
-              </div>
-            </div>
-
-            {/* Product Information */}
+          <Grid container spacing={2}>
             {result.producto && (
-              <div className="info-section">
-                <h4>📋 Información del Producto</h4>
-                <div className="info-grid">
-                  <div className="info-item">
-                    <label>ID:</label>
-                    <span>{result.producto.id}</span>
-                  </div>
-                  <div className="info-item">
-                    <label>Nombre:</label>
-                    <span>{result.producto.nombre}</span>
-                  </div>
-                  <div className="info-item full-width">
-                    <label>Descripción:</label>
-                    <span>{result.producto.descripcion}</span>
-                  </div>
-                </div>
-              </div>
+              <Grid item xs={12} md={6}>
+                <Card variant="outlined">
+                  <CardContent>
+                    <Typography variant="subtitle1" gutterBottom>📋 Información del Producto</Typography>
+                    <Typography variant="body2"><strong>ID:</strong> {result.producto.id}</Typography>
+                    <Typography variant="body2"><strong>Nombre:</strong> {result.producto.nombre}</Typography>
+                    {result.producto.descripcion && <Typography variant="body2"><strong>Descripción:</strong> {result.producto.descripcion}</Typography>}
+                  </CardContent>
+                </Card>
+              </Grid>
             )}
-
-            {/* Location Information */}
             {result.ubicacion && (
-              <div className="info-section">
-                <h4>📍 Ubicación</h4>
-                <div className="info-grid">
-                  <div className="info-item">
-                    <label>Almacén:</label>
-                    <span>{result.ubicacion.almacen}</span>
-                  </div>
-                  <div className="info-item">
-                    <label>Zona:</label>
-                    <span>{result.ubicacion.zona}</span>
-                  </div>
-                  <div className="info-item">
-                    <label>Posición:</label>
-                    <span>{result.ubicacion.posicion}</span>
-                  </div>
-                </div>
-              </div>
+              <Grid item xs={12} md={6}>
+                <Card variant="outlined">
+                  <CardContent>
+                    <Typography variant="subtitle1" gutterBottom>📍 Ubicación</Typography>
+                    <Typography variant="body2"><strong>Almacén:</strong> {result.ubicacion.almacen}</Typography>
+                    <Typography variant="body2"><strong>Zona:</strong> {result.ubicacion.zona}</Typography>
+                    {result.ubicacion.posicion && <Typography variant="body2"><strong>Posición:</strong> {result.ubicacion.posicion}</Typography>}
+                  </CardContent>
+                </Card>
+              </Grid>
             )}
+            <Grid item xs={12} md={6}>
+              <Card variant="outlined">
+                <CardContent>
+                  <Typography variant="subtitle1" gutterBottom>📅 Seguimiento</Typography>
+                  <Typography variant="body2"><strong>Creado:</strong> {formatDate(result.fechaCreacion ?? result.timestamp)}</Typography>
+                  <Typography variant="body2"><strong>Actualizado:</strong> {formatDate((result as { ultimaActualizacion?: string }).ultimaActualizacion ?? result.timestamp)}</Typography>
+                </CardContent>
+              </Card>
+            </Grid>
+          </Grid>
 
-            {/* Tracking Information */}
-            <div className="info-section">
-              <h4>📅 Seguimiento</h4>
-              <div className="info-grid">
-                <div className="info-item">
-                  <label>Creado:</label>
-                  <span>{formatDate(result.fechaCreacion)}</span>
-                </div>
-                <div className="info-item">
-                  <label>Actualizado:</label>
-                  <span>{formatDate(result.ultimaActualizacion)}</span>
-                </div>
-              </div>
-            </div>
-
-            {/* Action Buttons */}
+          <Box mt={2}>
+            <Typography variant="subtitle2" gutterBottom>Acciones</Typography>
             {renderActionButtons(result)}
-          </div>
-        </div>
+          </Box>
+        </Box>
       )}
 
-      {/* Recent Searches */}
       {recentSearches.length > 0 && (
-        <div className="recent-searches">
-          <h3>📝 Búsquedas Recientes</h3>
-          <div className="recent-list">
+        <Box mt={3}>
+          <Typography variant="subtitle1" gutterBottom>📝 Búsquedas Recientes</Typography>
+          <List dense>
             {recentSearches.map((item, index) => (
-              <div 
-                key={`${item.codigo}-${index}`}
-                className="recent-item"
-                onClick={() => handleQuickSearch(item)}
-              >
-                <div className="recent-code">
-                  <span className="code">{item.codigo}</span>
-                  <span className={`badge ${getTypeClass(item.tipo)}`}>
-                    {item.tipo === 'caja' ? '📦' : '🚛'}
-                  </span>
-                </div>
-                <div className="recent-info">
-                  <div className="product-name">{item.producto?.nombre || 'Producto sin nombre'}</div>
-                  <div className="search-time">{formatDate(item.timestamp)}</div>
-                </div>
-              </div>
+              <ListItem key={`${item.codigo}-${index}`} disablePadding>
+                <ListItemButton onClick={() => handleQuickSearch(item)}>
+                  <Box width="100%" display="flex" justifyContent="space-between" alignItems="center" flexWrap="wrap" gap={1}>
+                    <Typography variant="body2">{item.codigo}</Typography>
+                    <Chip size="small" label={item.tipo === 'caja' ? '📦' : '🚛'} />
+                    <Typography variant="caption" color="text.secondary">{item.producto?.nombre || 'Producto sin nombre'}</Typography>
+                    <Typography variant="caption">{formatDate(item.timestamp)}</Typography>
+                  </Box>
+                </ListItemButton>
+              </ListItem>
             ))}
-          </div>
-        </div>
+          </List>
+        </Box>
       )}
-    </div>
+    </Box>
   );
 };
 

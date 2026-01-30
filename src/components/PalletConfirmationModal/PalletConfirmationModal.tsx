@@ -1,6 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import { getPalletDetails } from '../../api/endpoints';
-import './PalletConfirmationModal.css';
+import { error as logError } from '../../utils/logger';
+import {
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Button,
+  Typography,
+  Box,
+  Alert,
+  IconButton,
+  Stack,
+} from '../ui';
 
 interface PalletDetails {
   codigo: string;
@@ -38,13 +50,12 @@ const PalletConfirmationModal: React.FC<PalletConfirmationModalProps> = ({
   onReportIssue,
   onClose,
   processing = false,
-  processingError = null
+  processingError = null,
 }) => {
   const [palletDetails, setPalletDetails] = useState<PalletDetails | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string>('');
 
-  // Fetch pallet details when modal opens
   useEffect(() => {
     if (isOpen && palletCode) {
       fetchPalletDetails();
@@ -54,17 +65,15 @@ const PalletConfirmationModal: React.FC<PalletConfirmationModalProps> = ({
   const fetchPalletDetails = async () => {
     setLoading(true);
     setError('');
-    
     try {
       const response = await getPalletDetails(palletCode);
-      
       if (response.success && response.data) {
         setPalletDetails(response.data);
       } else {
         setError('No se pudo obtener la información del pallet');
       }
     } catch (err) {
-      console.error('Error fetching pallet details:', err);
+      logError('Error fetching pallet details:', err);
       setError('Error al cargar la información del pallet');
     } finally {
       setLoading(false);
@@ -72,8 +81,6 @@ const PalletConfirmationModal: React.FC<PalletConfirmationModalProps> = ({
   };
 
   const handleConfirm = () => {
-    // No cerrar el modal aquí - se cerrará automáticamente cuando la operación sea exitosa
-    // Si hay error, se mostrará en el modal
     onConfirm();
   };
 
@@ -88,12 +95,6 @@ const PalletConfirmationModal: React.FC<PalletConfirmationModalProps> = ({
     onClose();
   };
 
-  const handleOverlayClick = (e: React.MouseEvent) => {
-    if (e.target === e.currentTarget) {
-      handleClose();
-    }
-  };
-
   const formatDate = (dateString: string) => {
     try {
       return new Date(dateString).toLocaleDateString('es-ES', {
@@ -101,7 +102,7 @@ const PalletConfirmationModal: React.FC<PalletConfirmationModalProps> = ({
         month: 'short',
         day: 'numeric',
         hour: '2-digit',
-        minute: '2-digit'
+        minute: '2-digit',
       });
     } catch {
       return dateString;
@@ -110,183 +111,87 @@ const PalletConfirmationModal: React.FC<PalletConfirmationModalProps> = ({
 
   const cajasDañadas = palletDetails?.cajas.filter(caja => caja.estado === 'dañado').length || 0;
 
-  if (!isOpen) return null;
-
   return (
-    <div className="pallet-modal-overlay" onClick={handleOverlayClick}>
-      <div className="pallet-modal-container">
-        <div className="pallet-modal-header">
-          <h2>📦 Confirmación de Pallet</h2>
-          <button 
-            className="pallet-modal-close"
-            onClick={handleClose}
-            disabled={loading}
+    <Dialog open={isOpen} onClose={handleClose} maxWidth="sm" fullWidth>
+      <DialogTitle sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <span>📦 Confirmación de Pallet</span>
+        <IconButton aria-label="cerrar" onClick={handleClose} disabled={loading} size="small">
+          ✕
+        </IconButton>
+      </DialogTitle>
+      <DialogContent>
+        {loading && (
+          <Box py={3} textAlign="center">
+            <Typography color="text.secondary">Cargando información del pallet...</Typography>
+          </Box>
+        )}
+
+        {error && !processingError && (
+          <Alert severity="error" sx={{ mb: 2 }} action={<Button size="small" onClick={fetchPalletDetails}>Reintentar</Button>}>
+            {error}
+          </Alert>
+        )}
+
+        {processingError && (
+          <Alert severity="error" sx={{ mb: 2 }} action={<Button size="small" onClick={fetchPalletDetails}>Reintentar</Button>}>
+            <Typography variant="subtitle2">Error de conexión con el servidor</Typography>
+            <Typography variant="body2">{processingError}</Typography>
+            <Typography variant="caption">💡 Verifica tu conexión a internet e intenta nuevamente</Typography>
+          </Alert>
+        )}
+
+        {processing && (
+          <Box py={2} textAlign="center">
+            <Typography color="text.secondary">Procesando recepción del pallet...</Typography>
+          </Box>
+        )}
+
+        {palletDetails && (
+          <Stack spacing={2}>
+            <Box display="flex" justifyContent="space-between" alignItems="center" flexWrap="wrap" gap={1}>
+              <Typography variant="subtitle1"><strong>Código: {palletDetails.codigo}</strong></Typography>
+              <Typography variant="body2" color="text.secondary">{palletDetails.estado.toUpperCase()}</Typography>
+            </Box>
+            <Stack spacing={0.5}>
+              <Typography variant="body2">📍 Ubicación: {palletDetails.ubicacion}</Typography>
+              {palletDetails.producto && <Typography variant="body2">📋 Producto: {palletDetails.producto}</Typography>}
+              {palletDetails.lote && <Typography variant="body2">🏷️ Lote: {palletDetails.lote}</Typography>}
+              {palletDetails.fechaVencimiento && <Typography variant="body2">📅 Vencimiento: {formatDate(palletDetails.fechaVencimiento)}</Typography>}
+              <Typography variant="body2">⏰ Creado: {formatDate(palletDetails.fechaCreacion)}</Typography>
+              {palletDetails.responsable && <Typography variant="body2">👤 Responsable: {palletDetails.responsable}</Typography>}
+            </Stack>
+            <Box>
+              <Typography variant="subtitle2" gutterBottom>📦 Resumen de Cajas</Typography>
+              <Typography variant="body2">{palletDetails.numeroCajas} total de cajas</Typography>
+              {cajasDañadas > 0 && (
+                <Alert severity="warning" sx={{ mt: 1 }}>⚠️ {cajasDañadas} caja(s) con problemas</Alert>
+              )}
+            </Box>
+            <Typography variant="subtitle2">¿Confirma que hay {palletDetails.numeroCajas} cajas en este pallet?</Typography>
+            <Typography variant="body2" color="text.secondary">Revise físicamente el pallet antes de confirmar</Typography>
+          </Stack>
+        )}
+      </DialogContent>
+      {palletDetails && (
+        <DialogActions sx={{ flexDirection: 'column', alignItems: 'stretch', gap: 1, p: 2 }}>
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={handleConfirm}
+            disabled={processing || loading}
           >
-            ✕
-          </button>
-        </div>
-
-        <div className="pallet-modal-content">
-          {loading && (
-            <div className="pallet-loading">
-              <div className="loading-spinner"></div>
-              <p>Cargando información del pallet...</p>
-            </div>
-          )}
-
-          {error && !processingError && (
-            <div className="pallet-error">
-              <span className="error-icon">⚠️</span>
-              <p>{error}</p>
-              <button onClick={fetchPalletDetails} className="retry-btn">
-                Reintentar
-              </button>
-            </div>
-          )}
-
-          {processingError && (
-            <div className="pallet-error">
-              <span className="error-icon">⚠️</span>
-              <p><strong>Error de conexión con el servidor</strong></p>
-              <p>{processingError}</p>
-              <p className="error-suggestion">
-                💡 Verifica tu conexión a internet e intenta nuevamente
-              </p>
-              <button onClick={fetchPalletDetails} className="retry-btn">
-                Reintentar
-              </button>
-            </div>
-          )}
-
-          {processing && (
-            <div className="pallet-processing">
-              <div className="loading-spinner"></div>
-              <p>Procesando recepción del pallet...</p>
-            </div>
-          )}
-
-          {palletDetails && (
-            <div className="pallet-details">
-              <div className="pallet-info-header">
-                <div className="pallet-code">
-                  <strong>Código: {palletDetails.codigo}</strong>
-                </div>
-                <div className={`pallet-status ${palletDetails.estado}`}>
-                  {palletDetails.estado.toUpperCase()}
-                </div>
-              </div>
-
-              <div className="pallet-info-grid">
-                <div className="info-item">
-                  <label>📍 Ubicación:</label>
-                  <span>{palletDetails.ubicacion}</span>
-                </div>
-                
-                {palletDetails.producto && (
-                  <div className="info-item">
-                    <label>📋 Producto:</label>
-                    <span>{palletDetails.producto}</span>
-                  </div>
-                )}
-                
-                {palletDetails.lote && (
-                  <div className="info-item">
-                    <label>🏷️ Lote:</label>
-                    <span>{palletDetails.lote}</span>
-                  </div>
-                )}
-                
-                {palletDetails.fechaVencimiento && (
-                  <div className="info-item">
-                    <label>📅 Vencimiento:</label>
-                    <span>{formatDate(palletDetails.fechaVencimiento)}</span>
-                  </div>
-                )}
-                
-                <div className="info-item">
-                  <label>⏰ Creado:</label>
-                  <span>{formatDate(palletDetails.fechaCreacion)}</span>
-                </div>
-                
-                {palletDetails.responsable && (
-                  <div className="info-item">
-                    <label>👤 Responsable:</label>
-                    <span>{palletDetails.responsable}</span>
-                  </div>
-                )}
-              </div>
-
-              <div className="cajas-summary">
-                <div className="cajas-count">
-                  <h3>📦 Resumen de Cajas</h3>
-                  <div className="count-display">
-                    <span className="total-count">{palletDetails.numeroCajas}</span>
-                    <span className="count-label">Total de cajas</span>
-                  </div>
-                  
-                  {cajasDañadas > 0 && (
-                    <div className="damaged-alert">
-                      <span className="warning-icon">⚠️</span>
-                      <span>{cajasDañadas} caja(s) con problemas</span>
-                    </div>
-                  )}
-                </div>
-              </div>
-
-              <div className="confirmation-question">
-                <h3>¿Confirma que hay {palletDetails.numeroCajas} cajas en este pallet?</h3>
-                <p>Revise físicamente el pallet antes de confirmar</p>
-              </div>
-
-              <div className="pallet-actions">
-                <button 
-                  onClick={handleConfirm}
-                  className="confirm-btn"
-                  disabled={processing || loading}
-                >
-                  {processing ? '⏳ Procesando...' : `✅ Sí, confirmo ${palletDetails.numeroCajas} cajas`}
-                </button>
-                
-                <div className="issue-buttons">
-                  <button 
-                    onClick={() => handleReportIssue('Número de cajas no coincide')}
-                    className="issue-btn count-issue"
-                    disabled={processing || loading}
-                  >
-                    📊 El número no coincide
-                  </button>
-                  
-                  <button 
-                    onClick={() => handleReportIssue('Cajas dañadas')}
-                    className="issue-btn damage-issue"
-                    disabled={processing || loading}
-                  >
-                    📦 Cajas dañadas
-                  </button>
-                  
-                  <button 
-                    onClick={() => handleReportIssue('Producto incorrecto')}
-                    className="issue-btn product-issue"
-                    disabled={processing || loading}
-                  >
-                    🏷️ Producto incorrecto
-                  </button>
-                  
-                  <button 
-                    onClick={() => handleReportIssue('Otro problema operacional')}
-                    className="issue-btn other-issue"
-                    disabled={processing || loading}
-                  >
-                    ❓ Otro problema
-                  </button>
-                </div>
-              </div>
-            </div>
-          )}
-        </div>
-      </div>
-    </div>
+            {processing ? '⏳ Procesando...' : `✅ Sí, confirmo ${palletDetails.numeroCajas} cajas`}
+          </Button>
+          <Stack direction="row" flexWrap="wrap" gap={1} justifyContent="center">
+            <Button size="small" variant="outlined" onClick={() => handleReportIssue('Número de cajas no coincide')} disabled={processing || loading}>📊 El número no coincide</Button>
+            <Button size="small" variant="outlined" onClick={() => handleReportIssue('Cajas dañadas')} disabled={processing || loading}>📦 Cajas dañadas</Button>
+            <Button size="small" variant="outlined" onClick={() => handleReportIssue('Producto incorrecto')} disabled={processing || loading}>🏷️ Producto incorrecto</Button>
+            <Button size="small" variant="outlined" onClick={() => handleReportIssue('Otro problema operacional')} disabled={processing || loading}>❓ Otro problema</Button>
+          </Stack>
+        </DialogActions>
+      )}
+    </Dialog>
   );
 };
 
-export default PalletConfirmationModal; 
+export default PalletConfirmationModal;

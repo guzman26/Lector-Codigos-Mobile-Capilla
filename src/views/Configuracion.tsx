@@ -1,84 +1,52 @@
 import React from 'react';
-import { useTheme } from '../context/ThemeContext';
-import './Configuracion.css';
+import {
+  Box,
+  Stack,
+  Typography,
+  TextField,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
+  Button,
+} from '../components/ui';
 
 const Configuracion: React.FC = () => {
-  const { isDarkMode, toggleTheme } = useTheme();
-
   return (
-    <div className="configuracion-content">
-      <div className="config-section">
-        <h2 className="config-title">Configuración del Terminal</h2>
-        
-        <div className="config-group">
-          <h3 className="group-title">General</h3>
-          <div className="config-item">
-            <label className="config-label">ID Terminal:</label>
-            <input 
-              type="text" 
-              className="config-input" 
-              value="TRM-001" 
-              readOnly 
-            />
-          </div>
-          <div className="config-item">
-            <label className="config-label">Modo de escaneo:</label>
-            <select className="config-select">
-              <option value="auto">Automático</option>
-              <option value="manual">Manual</option>
-            </select>
-          </div>
-        </div>
-
-        <div className="config-group">
-          <h3 className="group-title">Apariencia</h3>
-          <div className="config-item">
-            <label className="config-label">Tema:</label>
-            <div className="theme-toggle-container">
-              <span className="theme-label">Modo claro</span>
-              <button 
-                className={`theme-toggle ${isDarkMode ? 'active' : ''}`}
-                onClick={toggleTheme}
-                aria-label={`Cambiar a modo ${isDarkMode ? 'claro' : 'oscuro'}`}
-              >
-                <div className="theme-toggle-thumb"></div>
-              </button>
-              <span className="theme-label">Modo oscuro</span>
-            </div>
-          </div>
-        </div>
-
-        <div className="config-group">
-          <h3 className="group-title">Conectividad</h3>
-          <div className="config-item">
-            <label className="config-label">Servidor:</label>
-            <input 
-              type="text" 
-              className="config-input" 
-              placeholder="192.168.1.100"
-            />
-          </div>
-          <div className="config-item">
-            <label className="config-label">Puerto:</label>
-            <input 
-              type="number" 
-              className="config-input" 
-              placeholder="8080"
-            />
-          </div>
-        </div>
-
-        <div className="config-actions">
-          <button className="config-btn primary">
+    <Box>
+      <Typography variant="h5" gutterBottom>Configuración del Terminal</Typography>
+      <Stack spacing={3} sx={{ width: '100%', maxWidth: 400 }}>
+        <Box>
+          <Typography variant="subtitle2" gutterBottom>General</Typography>
+          <Stack spacing={2}>
+            <TextField label="ID Terminal" value="TRM-001" size="small" fullWidth InputProps={{ readOnly: true }} />
+            <FormControl fullWidth size="small">
+              <InputLabel>Modo de escaneo</InputLabel>
+              <Select label="Modo de escaneo" defaultValue="auto">
+                <MenuItem value="auto">Automático</MenuItem>
+                <MenuItem value="manual">Manual</MenuItem>
+              </Select>
+            </FormControl>
+          </Stack>
+        </Box>
+        <Box>
+          <Typography variant="subtitle2" gutterBottom>Conectividad</Typography>
+          <Stack spacing={2}>
+            <TextField label="Servidor" placeholder="192.168.1.100" size="small" fullWidth />
+            <TextField label="Puerto" type="number" placeholder="8080" size="small" fullWidth />
+          </Stack>
+        </Box>
+        <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
+          <Button variant="contained" fullWidth sx={{ width: { xs: '100%', sm: 'auto' } }}>
             Guardar Configuración
-          </button>
-          <button className="config-btn secondary">
+          </Button>
+          <Button variant="outlined" fullWidth sx={{ width: { xs: '100%', sm: 'auto' } }}>
             Restaurar Defaults
-          </button>
-        </div>
-      </div>
-    </div>
+          </Button>
+        </Stack>
+      </Stack>
+    </Box>
   );
 };
 
-export default Configuracion; 
+export default Configuracion;
