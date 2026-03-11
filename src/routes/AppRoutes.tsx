@@ -9,6 +9,7 @@ import ConsultarCodigo from '../views/Scanning/ConsultarCodigo/ConsultarCodigo';
 import CrearPallet from '../views/Scanning/CreatePalletForm/CreatePalletForm';
 import SelectSale from '../views/Sales/SelectSale';
 import ScanForSale from '../views/Sales/ScanForSale';
+import CreateSale from '../views/Sales/CreateSale';
 
 const AppRoutes: React.FC = () => {
   return (
@@ -39,6 +40,7 @@ const AppRoutes: React.FC = () => {
           {/* Sales routes */}
           <Route path="/sales/select" element={<SelectSale />} />
           <Route path="/sales/scan/:saleId" element={<ScanForSale />} />
+          <Route path="/sales/create" element={<CreateSale />} />
           
           {/* Future routes can be added here */}
           {/* <Route path="/scanner" element={<Scanner />} /> */}

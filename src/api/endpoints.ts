@@ -15,7 +15,13 @@ import type {
   GetDraftSalesResponse,
   AddBoxesToSaleRequest,
   AddBoxesToSaleResponse,
-  SalesOrder
+  SalesOrder,
+  CalibreSelection,
+  CreateSaleRequest,
+  Customer,
+  GetCustomersRequest,
+  GetCustomersResponse,
+  InventoryValidationResult,
 } from './types';
 
 /**
@@ -675,6 +681,150 @@ export const getDraftSales = async (
 };
 
 /**
+ * Gets existing customers for sale creation flow
+ */
+export const getCustomers = async (
+  request?: GetCustomersRequest
+): Promise<ApiResponse<GetCustomersResponse>> => {
+  try {
+    const response = await apiClient.post<GetCustomersResponse>(
+      '/sales',
+      {
+        resource: 'customer',
+        action: 'get',
+        filters: {
+          status: 'ACTIVE',
+          ...request?.filters,
+        },
+        pagination: request?.pagination,
+      }
+    );
+
+    // Normalize possible response shapes to { items, ... }
+    if (response.success && response.data) {
+      if (Array.isArray(response.data)) {
+        return {
+          ...response,
+          data: {
+            items: response.data as Customer[],
+            count: response.data.length,
+          },
+        };
+      }
+
+      const payload = response.data as any;
+      if (Array.isArray(payload.items)) {
+        return response;
+      }
+      if (payload.customer && typeof payload.customer === 'object') {
+        return {
+          ...response,
+          data: { items: [payload.customer as Customer], count: 1 },
+        };
+      }
+    }
+
+    return response;
+  } catch (error) {
+    console.error('❌ Error fetching customers:', error);
+
+    if (error instanceof apiClient.ApiClientError) {
+      throw error;
+    }
+
+    throw new apiClient.ApiClientError(
+      'Error al obtener clientes',
+      'REQUEST_FAILED',
+      error
+    );
+  }
+};
+
+/**
+ * Validates stock by calibre before creating sale
+ */
+export const validateInventoryByCalibres = async (
+  calibres: CalibreSelection[]
+): Promise<ApiResponse<InventoryValidationResult>> => {
+  if (!Array.isArray(calibres) || calibres.length === 0) {
+    throw new apiClient.ApiClientError(
+      'Debe proporcionar al menos un calibre',
+      'VALIDATION_ERROR'
+    );
+  }
+
+  try {
+    return await apiClient.post<InventoryValidationResult>(
+      '/sales',
+      {
+        resource: 'order',
+        action: 'validate-inventory',
+        calibres,
+      }
+    );
+  } catch (error) {
+    console.error('❌ Error validating inventory by calibres:', error);
+
+    if (error instanceof apiClient.ApiClientError) {
+      throw error;
+    }
+
+    throw new apiClient.ApiClientError(
+      'Error al validar disponibilidad por calibre',
+      'REQUEST_FAILED',
+      error
+    );
+  }
+};
+
+/**
+ * Creates a sale request (DRAFT) using customer + requested calibres
+ */
+export const createSale = async (
+  request: CreateSaleRequest
+): Promise<ApiResponse<SalesOrder>> => {
+  if (!request.customerId || !request.type) {
+    throw new apiClient.ApiClientError(
+      'customerId y type son requeridos',
+      'VALIDATION_ERROR'
+    );
+  }
+
+  if (!Array.isArray(request.calibres) || request.calibres.length === 0) {
+    throw new apiClient.ApiClientError(
+      'Debe incluir al menos un calibre',
+      'VALIDATION_ERROR'
+    );
+  }
+
+  try {
+    return await apiClient.post<SalesOrder>(
+      '/sales',
+      {
+        resource: 'order',
+        action: 'create',
+        customerId: request.customerId,
+        type: request.type,
+        calibres: request.calibres,
+        notes: request.notes,
+      }
+    );
+  } catch (error) {
+    console.error('❌ Error creating sale:', error);
+
+    if (error instanceof apiClient.ApiClientError) {
+      throw error;
+    }
+
+    throw new apiClient.ApiClientError(
+      'Error al crear la solicitud de venta',
+      'REQUEST_FAILED',
+      error
+    );
+  }
+};
+
+/**
  * Adds a box or pallet to an existing DRAFT sale
  * Validates the code before making the request
  */
@@ -792,6 +942,9 @@ export const endpoints = {
   createPallet,
   getPalletDetails,
   getDraftSales,
+  getCustomers,
+  validateInventoryByCalibres,
+  createSale,
   addBoxesToSale,
   submitAddBoxesToSale,
 } as const; 

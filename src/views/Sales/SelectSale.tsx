@@ -64,6 +64,9 @@ const SelectSale: React.FC = () => {
         <Button variant="outlined" size="small" onClick={handleBack}>← Volver</Button>
         <Typography variant="h5">📋 Seleccionar Venta</Typography>
         <Typography variant="body2" color="text.secondary">Selecciona una venta en borrador para agregar items</Typography>
+        <Button variant="contained" onClick={() => navigate('/sales/create')}>
+          + Crear Nueva Venta
+        </Button>
       </Stack>
 
       <TextField

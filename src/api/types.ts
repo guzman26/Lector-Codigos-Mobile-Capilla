@@ -232,4 +232,59 @@ export interface AddBoxesToSaleResponse {
     calibre: string;
     eggs: number;
   };
-} 
+}
+
+export type SaleType =
+  | 'Venta'
+  | 'Reposición'
+  | 'Donación'
+  | 'Inutilizado'
+  | 'Ración';
+
+export interface Customer {
+  customerId: string;
+  name: string;
+  email?: string;
+  phone?: string;
+  status?: 'ACTIVE' | 'INACTIVE';
+}
+
+export interface GetCustomersRequest {
+  filters?: {
+    status?: 'ACTIVE' | 'INACTIVE';
+    query?: string;
+  };
+  pagination?: {
+    limit?: number;
+    lastKey?: string;
+  };
+}
+
+export interface GetCustomersResponse {
+  items: Customer[];
+  count?: number;
+  nextKey?: string | null;
+}
+
+export interface CalibreSelection {
+  calibre: string;
+  boxCount: number;
+}
+
+export interface CreateSaleRequest {
+  customerId: string;
+  type: SaleType;
+  calibres: CalibreSelection[];
+  notes?: string;
+}
+
+export interface InventoryValidationResult {
+  valid: boolean;
+  message?: string;
+  calibreAvailability?: Array<{
+    calibre: string;
+    requested: number;
+    available: number;
+    missing: number;
+  }>;
+}

@@ -71,6 +71,9 @@ const Dashboard: React.FC = () => {
         <Button variant="outlined" onClick={() => navigate('/crear-pallet')} fullWidth>
           Crear Pallet
         </Button>
+        <Button variant="outlined" onClick={() => navigate('/sales/create')} fullWidth>
+          Crear Venta
+        </Button>
         <Button variant="outlined" onClick={() => navigate('/sales/select')} fullWidth>
           Agregar a Venta
         </Button>

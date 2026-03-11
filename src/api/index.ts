@@ -36,6 +36,13 @@ export type {
   GetDraftSalesResponse,
   AddBoxesToSaleRequest,
   AddBoxesToSaleResponse,
+  SaleType,
+  Customer,
+  GetCustomersRequest,
+  GetCustomersResponse,
+  CalibreSelection,
+  CreateSaleRequest,
+  InventoryValidationResult,
 } from './types';
 
 // Endpoints
@@ -47,6 +54,9 @@ export {
   processScan,
   submitScan,
   getDraftSales,
+  getCustomers,
+  validateInventoryByCalibres,
+  createSale,
   addBoxesToSale,
   submitAddBoxesToSale,
 } from './endpoints';
